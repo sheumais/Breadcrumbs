@@ -44,10 +44,9 @@ local function OnAddOnLoaded(_, name)
     EVENT_MANAGER:UnregisterForEvent(Breadcrumbs.name, EVENT_ADD_ON_LOADED)
     
     Breadcrumbs.savedVariables = ZO_SavedVars:NewCharacterIdSettings("BreadcrumbsSavedVariables", Breadcrumbs.savedVariablesVersion, nil, Breadcrumbs.defaults)
-    Breadcrumbs.ClearLinePool()
-    Breadcrumbs.InitialiseZone()
-    Breadcrumbs.GenerateSavedLines()
     Breadcrumbs.CreateUI()
+    Breadcrumbs.ClearLinePool()
+    Breadcrumbs.RefreshLines() 
     Breadcrumbs.StartPolling()
 end
 

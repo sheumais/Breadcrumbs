@@ -89,10 +89,11 @@ end
 function Breadcrumbs.DrawAllLines()
     local linePool = Breadcrumbs.GetLinePool()
     for _, line in pairs( linePool ) do
-        if line.use ~= true then break end
+        if line.use ~= true then line.lineControl:SetHidden(true) break end
         local x1, y1, visible1 = GetViewCoordinates(line.x1, line.y1, line.z1)
         local x2, y2, visible2 = GetViewCoordinates(line.x2, line.y2, line.z2)
         
+        if line.lineControl == nil then break end
         if (not visible1 and not visible2) then
             line.lineControl:SetHidden(true)
         else

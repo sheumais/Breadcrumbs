@@ -1,6 +1,6 @@
 Breadcrumbs = Breadcrumbs or {}
 
-function Breadcrumbs.CreateLinePrimitive(x1, y1, z1, x2, y2, z2, colour)
+function Breadcrumbs.CreateLinePrimitive(x1, y1, z1, x2, y2, z2, colour --[[ Nilable --]] )
     return {
         x1 = x1,
         y1 = y1,
@@ -26,7 +26,7 @@ function Breadcrumbs.CreateLineControl( name )
     }
 end
 
-function Breadcrumbs.AddLineToPool( x1, y1, z1, x2, y2, z2, colour )
+function Breadcrumbs.AddLineToPool( x1, y1, z1, x2, y2, z2, colour --[[ Nilable --]] )
     local line
     local linePool = Breadcrumbs.GetLinePool()
     -- try to find an unused line
@@ -61,6 +61,17 @@ function Breadcrumbs.ClearLinePool()
     Breadcrumbs.savedVariables.linePool = {}
 end
 
+-- Lines don't simply vanish from the screen when we remove savedVariables data
+-- So we set old lines to be replaced using this function.
+-- This ensures their registered control names aren't trying to be overwritten uselessly
+-- Avoids "Failure to create control BreadcrumbsLine0. Duplicate name." error
+function Breadcrumbs.NilLinePool()
+    local linePool = Breadcrumbs.GetLinePool()
+    for _, line in pairs( linePool ) do
+        line.use = false
+    end
+end
+
 function Breadcrumbs.GetSavedZoneLines(zoneId)
     return Breadcrumbs.savedVariables.savedLines[zoneId] or {}
 end
@@ -74,20 +85,77 @@ function Breadcrumbs.InitialiseZone()
     Breadcrumbs.savedVariables.savedLines[zoneId] = Breadcrumbs.GetSavedZoneLines(zoneId)
 end
 
-function Breadcrumbs.CreateSavedZoneLine(x1, y1, z1, x2, y2, z2, colour)
+function Breadcrumbs.CreateSavedZoneLine(x1, y1, z1, x2, y2, z2, colour --[[ Nilable --]] )
+    Breadcrumbs.InitialiseZone()
     local zoneId = Breadcrumbs.GetZoneId()
     local line = Breadcrumbs.CreateLinePrimitive(x1, y1, z1, x2, y2, z2, colour)
-
-    Breadcrumbs.savedVariables.savedLines[zoneId] = Breadcrumbs.GetSavedZoneLines(zoneId)
     table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], line)
+    Breadcrumbs.RefreshLines()
     return zoneId
 end
 
-function Breadcrumbs.GenerateSavedLines()
-    Breadcrumbs.ClearLinePool()
-    local zoneId, _, _, _ = GetUnitRawWorldPosition("player")
+function Breadcrumbs.CreatedSavedZoneLineByOffset(xo, yo, zo, colour --[[ Nilable --]] ) -- /script Breadcrumbs.CreatedSavedZoneLineByOffset(1000, 0, 0, nil)
+    Breadcrumbs.InitialiseZone()
+    local zoneId, x, y, z = GetUnitRawWorldPosition("player")
+    local line = Breadcrumbs.CreateLinePrimitive(x, y, z, x + xo, y + yo, z + zo, colour)
+    table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], line)
+    Breadcrumbs.RefreshLines()
+    return zoneId
+end
+
+function Breadcrumbs.Generate3DAxisLines() -- /script Breadcrumbs.Generate3DAxisLines() 
+    Breadcrumbs.InitialiseZone()
+    local zoneId, x, y, z = GetUnitRawWorldPosition("player")
+    table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], Breadcrumbs.CreateLinePrimitive(x, y, z, x + 1000, y, z, {1,0,0,1}))
+    table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], Breadcrumbs.CreateLinePrimitive(x, y, z, x, y + 1000, z, {0,1,0,1}))
+    table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], Breadcrumbs.CreateLinePrimitive(x, y, z, x, y, z + 1000, {0,0,1,1}))
+    Breadcrumbs.RefreshLines()
+    return zoneId
+end
+
+local function squaredDistance(x1, y1, z1, x2, y2, z2)
+    local dx = x2 - x1
+    local dy = y2 - y1
+    local dz = z2 - z1
+    return dx * dx + dy * dy + dz * dz
+end
+
+function Breadcrumbs.RemoveClosestLine() -- /script Breadcrumbs.RemoveClosestLine()
+    Breadcrumbs.InitialiseZone()
+    local zoneId, x, y, z = GetUnitRawWorldPosition("player")
+    local lines = Breadcrumbs.GetSavedZoneLines(zoneId)
+
+    local closest_line_index = nil
+    local min_distance = math.huge
+
+    for index, line in pairs(lines) do
+        local dist1 = squaredDistance(x, y, z, line.x1, line.y1, line.z1)
+        local dist2 = squaredDistance(x, y, z, line.x2, line.y2, line.z2)
+        
+        local closest_dist = math.min(dist1, dist2)
+        if closest_dist < min_distance then
+            min_distance = closest_dist
+            closest_line_index = index
+        end
+    end
+
+    if closest_line_index then
+        table.remove(Breadcrumbs.savedVariables.savedLines[zoneId], closest_line_index)
+    end
+    Breadcrumbs.RefreshLines()
+end
+
+function Breadcrumbs.GenerateSavedLines() -- /script Breadcrumbs.GenerateSavedLines()
+    local zoneId = Breadcrumbs.GetZoneId()
     local lines = Breadcrumbs.GetSavedZoneLines(zoneId)
     for _, line in pairs( lines ) do
         Breadcrumbs.AddLineToPool(line.x1, line.y1, line.z1, line.x2, line.y2, line.z2, line.colour)
     end
+end
+
+function Breadcrumbs.RefreshLines()
+    Breadcrumbs.StopPolling()
+    Breadcrumbs.NilLinePool()
+    Breadcrumbs.GenerateSavedLines()
+    Breadcrumbs.StartPolling()
 end
