@@ -1,11 +1,14 @@
 Breadcrumbs = Breadcrumbs or {}
 Breadcrumbs.name = "Breadcrumbs"
-Breadcrumbs.version = "1.0"
+Breadcrumbs.version = "1.1"
 Breadcrumbs.author = "TheMrPancake"
 
 Breadcrumbs.savedVariablesVersion = 1 -- don't change
 Breadcrumbs.defaults = {
-    lines = {}
+    linePool = {},
+    savedLines = {},
+    loc1 = nil,
+    loc2 = nil,
 }
 
 --------------------------
@@ -40,15 +43,11 @@ local function OnAddOnLoaded(_, name)
     if name ~= Breadcrumbs.name then return end
     EVENT_MANAGER:UnregisterForEvent(Breadcrumbs.name, EVENT_ADD_ON_LOADED)
     
-    savedVariables = ZO_SavedVars:NewCharacterIdSettings("BreadcrumbsSavedVariables", Breadcrumbs.savedVariablesVersion, nil, Breadcrumbs.defaults)
-    Breadcrumbs.savedVariables = savedVariables
+    Breadcrumbs.savedVariables = ZO_SavedVars:NewCharacterIdSettings("BreadcrumbsSavedVariables", Breadcrumbs.savedVariablesVersion, nil, Breadcrumbs.defaults)
+    Breadcrumbs.ClearLinePool()
+    Breadcrumbs.InitialiseZone()
+    Breadcrumbs.GenerateSavedLines()
     Breadcrumbs.CreateUI()
-
-    Breadcrumbs.savedVariables.lines = {}
-    local zone, x, y, z = GetUnitRawWorldPosition("player")
-    Breadcrumbs.CreateNewLine(x, y, z, x+1000, y, z+1000, {1,0,0,1})
-    Breadcrumbs.CreateNewLine(x, y, z, x+2000, y, z+1000, {0,1,0,1})
-    Breadcrumbs.CreateNewLine(x, y, z, x+3000, y, z+1000, {0,0,1,1})
     Breadcrumbs.StartPolling()
 end
 

@@ -3,7 +3,7 @@
 ## Author: TheMrPancake
 ## DependsOn:
 ## APIVersion: 101044
-## AddOnVersion: 1
+## AddOnVersion: 1.1
 ## SavedVariables: BreadcrumbsSavedVariables
 
 ; This Add-on is not created by, affiliated with or sponsored by ZeniMax Media Inc. or its affiliates. 

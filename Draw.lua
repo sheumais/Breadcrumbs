@@ -75,21 +75,21 @@ end
 function Breadcrumbs.DrawLine(x1, y1, x2, y2, line)
     line.backdrop:SetAnchorFill()
     line.backdrop:SetCenterColor(unpack(line.colour))
+    line.backdrop:SetEdgeColor(unpack(line.colour))
     line.lineControl:ClearAnchors()
     line.lineControl:SetAnchor(CENTER, GuiRoot, CENTER, (x1 + x2) / 2, (y1 + y2) / 2)
     local x = x2 - x1
     local y = y2 - y1
     local length = math.sqrt(x*x + y*y)
-    line.lineControl:SetDimensions(length, 10)
+    line.lineControl:SetDimensions(length, 8)
     local angle = math.atan(y/x)
     line.lineControl:SetTransformRotationZ(-angle)
 end
 
 function Breadcrumbs.DrawAllLines()
-    local lines = Breadcrumbs.GetLines()
-    if lines == {} then return end
-    for _, line in pairs( lines ) do
-        if line.use == false then return end
+    local linePool = Breadcrumbs.GetLinePool()
+    for _, line in pairs( linePool ) do
+        if line.use ~= true then break end
         local x1, y1, visible1 = GetViewCoordinates(line.x1, line.y1, line.z1)
         local x2, y2, visible2 = GetViewCoordinates(line.x2, line.y2, line.z2)
         
@@ -98,9 +98,6 @@ function Breadcrumbs.DrawAllLines()
         else
             line.lineControl:SetHidden(false)
             Breadcrumbs.DrawLine(x1, y1, x2, y2, line)
-    
-            d("Drawing line..")
-    
         end
     end
 end
