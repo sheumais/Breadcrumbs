@@ -1,6 +1,7 @@
 Breadcrumbs = Breadcrumbs or {}
 
 function Breadcrumbs.CreateLinePrimitive(x1, y1, z1, x2, y2, z2, colour --[[ Nilable --]] )
+    if x1 == nil or y1 == nil or z1 == nil or x2 == nil or y2 == nil or z2 == nil or colour == "" then return end
     return {
         x1 = x1,
         y1 = y1,
@@ -89,7 +90,9 @@ function Breadcrumbs.CreateSavedZoneLine(x1, y1, z1, x2, y2, z2, colour --[[ Nil
     Breadcrumbs.InitialiseZone()
     local zoneId = Breadcrumbs.GetZoneId()
     local line = Breadcrumbs.CreateLinePrimitive(x1, y1, z1, x2, y2, z2, colour)
-    table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], line)
+    if line then 
+        table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], line)
+    end    
     Breadcrumbs.RefreshLines()
     return zoneId
 end
@@ -98,7 +101,9 @@ function Breadcrumbs.CreatedSavedZoneLineByOffset(xo, yo, zo, colour --[[ Nilabl
     Breadcrumbs.InitialiseZone()
     local zoneId, x, y, z = GetUnitRawWorldPosition("player")
     local line = Breadcrumbs.CreateLinePrimitive(x, y, z, x + xo, y + yo, z + zo, colour)
-    table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], line)
+    if line then 
+        table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], line)
+    end
     Breadcrumbs.RefreshLines()
     return zoneId
 end
@@ -109,6 +114,37 @@ function Breadcrumbs.Generate3DAxisLines() -- /script Breadcrumbs.Generate3DAxis
     table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], Breadcrumbs.CreateLinePrimitive(x, y, z, x + 1000, y, z, {1,0,0,1}))
     table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], Breadcrumbs.CreateLinePrimitive(x, y, z, x, y + 1000, z, {0,1,0,1}))
     table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], Breadcrumbs.CreateLinePrimitive(x, y, z, x, y, z + 1000, {0,0,1,1}))
+    Breadcrumbs.RefreshLines()
+    return zoneId
+end
+
+function Breadcrumbs.Loc1() -- /script Breadcrumbs.Loc1()
+    local _, x, y, z = GetUnitRawWorldPosition("player")
+    Breadcrumbs.savedVariables.loc1 = {
+        x = x,
+        y = y,
+        z = z
+    }
+end
+
+function Breadcrumbs.Loc2() -- /script Breadcrumbs.Loc2()
+    local _, x, y, z = GetUnitRawWorldPosition("player")
+    Breadcrumbs.savedVariables.loc2 = {
+        x = x,
+        y = y,
+        z = z
+    }
+end
+
+function Breadcrumbs.CreateLineFromLocs(colour) -- /script Breadcrumbs.CreateLineFromLocs({1,0,1,1})
+    Breadcrumbs.InitialiseZone()
+    local zoneId = Breadcrumbs.GetZoneId()
+    local loc1 = Breadcrumbs.savedVariables.loc1
+    local loc2 = Breadcrumbs.savedVariables.loc2
+    local line = Breadcrumbs.CreateLinePrimitive(loc1.x, loc1.y, loc1.z, loc2.x, loc2.y, loc2.z, colour)
+    if line then
+        table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], line)
+    end
     Breadcrumbs.RefreshLines()
     return zoneId
 end

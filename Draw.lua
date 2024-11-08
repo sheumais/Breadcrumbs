@@ -69,10 +69,14 @@ local function GetViewCoordinates(wX, wY, wZ)
     -- camera object is still conveyed. I don't claim to know anything about this math though...
     local w, h = GetWorldDimensionsOfViewFrustumAtDepth(math.abs(pZ))
 
-    return pX * uiW / w, -pY * uiH / h, pZ > 0
+    local dX, dY, dZ = wX - cX, wY - cY, wZ - cZ
+    local dist = 1 + zo_sqrt( dX * dX + dY * dY + dZ * dZ )
+    local scale = 1000 / dist or 1
+
+    return pX * uiW / w, -pY * uiH / h, pZ > 0, scale
 end
 
-function Breadcrumbs.DrawLine(x1, y1, x2, y2, line)
+function Breadcrumbs.DrawLine(x1, y1, x2, y2, line, scale)
     line.backdrop:SetAnchorFill()
     line.backdrop:SetCenterColor(unpack(line.colour))
     line.backdrop:SetEdgeColor(unpack(line.colour))
@@ -81,7 +85,7 @@ function Breadcrumbs.DrawLine(x1, y1, x2, y2, line)
     local x = x2 - x1
     local y = y2 - y1
     local length = math.sqrt(x*x + y*y)
-    line.lineControl:SetDimensions(length, 8)
+    line.lineControl:SetDimensions(length, 8 * scale)
     local angle = math.atan(y/x)
     line.lineControl:SetTransformRotationZ(-angle)
 end
@@ -90,15 +94,16 @@ function Breadcrumbs.DrawAllLines()
     local linePool = Breadcrumbs.GetLinePool()
     for _, line in pairs( linePool ) do
         if line.use ~= true then line.lineControl:SetHidden(true) break end
-        local x1, y1, visible1 = GetViewCoordinates(line.x1, line.y1, line.z1)
-        local x2, y2, visible2 = GetViewCoordinates(line.x2, line.y2, line.z2)
-        
+        local x1, y1, visible1, scale1 = GetViewCoordinates(line.x1, line.y1, line.z1)
+        local x2, y2, visible2, scale2 = GetViewCoordinates(line.x2, line.y2, line.z2)
+        local scale = math.max(scale1, scale2)
+
         if line.lineControl == nil then break end
         if (not visible1 and not visible2) then
             line.lineControl:SetHidden(true)
         else
             line.lineControl:SetHidden(false)
-            Breadcrumbs.DrawLine(x1, y1, x2, y2, line)
+            Breadcrumbs.DrawLine(x1, y1, x2, y2, line, scale)
         end
     end
 end
