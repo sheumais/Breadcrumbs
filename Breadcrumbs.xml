@@ -1,0 +1,55 @@
+<GuiXml>
+    <Controls>
+        <TopLevelControl name="Breadcrumbs_Menu_Window" clampedToScreen="true" mouseEnabled="true" movable="true" hidden="true" >
+			<Anchor point="TOPLEFT" relativePoint="TOPLEFT" offsetX="600" offsetY="700" />
+			<Dimensions x="400" y="250" />
+			<Controls>
+				<Backdrop name="$(parent)_BG">
+					<Center file="esoui/art/tooltips/ui-tooltipcenter.dds" />
+        			<Edge file="esoui/art/tooltips/ui-sliderbackdrop.dds" edgeFileWidth="64" edgeFileHeight="8" />
+					<AnchorFill />
+				</Backdrop>
+				<Control name="$(parent)_Title" >
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" offsetX="4" offsetY="4" />
+					<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT" offsetX="-4" offsetY="40" />
+					<Controls>
+						<Label name="$(parent)_Subtitle" font="ZoFontHeader" text="Place New Line" >
+							<Anchor point="CENTER" relativePoint="CENTER" />
+						</Label>
+						<Button name="$(parent)_Close" inherits="ZO_CloseButton" >
+							<Anchor point="RIGHT" relativePoint="RIGHT" offsetX="-4" offsetY="-4" />
+                            <OnClicked>
+                                Breadcrumbs.HideUI()
+                            </OnClicked>
+						</Button>
+					</Controls>
+				</Control>
+                <Control name="$(parent)_Button_Group">
+                    <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)"/>
+                    <Controls>
+                        <Button name="$(parent)_Place_Button" text="Place" inherits="ZO_DefaultButton" >
+                            <Anchor point="LEFT" relativePoint="LEFT" offsetY="-26" offsetX="-4" />
+                            <OnClicked>
+                                Breadcrumbs.CreateLineFromLocs()
+                            </OnClicked>
+                        </Button>
+                        
+                        <Button name="$(parent)_Loc2" text="Loc2" inherits="ZO_DefaultButton">
+                            <Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT" relativeTo="$(parent)_Place_Button" offsetY="-6"/>
+                            <OnClicked>
+                                Breadcrumbs.Loc2()
+                            </OnClicked>
+                        </Button>
+                        <Button name="$(parent)_Loc1" text="Loc1" inherits="ZO_DefaultButton">
+                            <Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT" relativeTo="$(parent)_Loc2" offsetY="-6"/>
+                            <OnClicked>
+                                Breadcrumbs.Loc1()
+                            </OnClicked>
+                        </Button>
+
+                    </Controls>
+                </Control>
+			</Controls>
+		</TopLevelControl>
+	</Controls>
+</GuiXml>

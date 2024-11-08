@@ -9,7 +9,7 @@ function Breadcrumbs.CreateLinePrimitive(x1, y1, z1, x2, y2, z2, colour --[[ Nil
         x2 = x2,
         y2 = y2,
         z2 = z2,
-        colour = colour or {1, 1, 1, 1}
+        colour = colour or Breadcrumbs.savedVariables.colour or {1, 1, 1, 1}
     }
 end
 
@@ -46,7 +46,7 @@ function Breadcrumbs.AddLineToPool( x1, y1, z1, x2, y2, z2, colour --[[ Nilable 
     line.use = true
     line.x1, line.y1, line.z1 = x1, y1, z1
     line.x2, line.y2, line.z2 = x2, y2, z2
-    line.colour = colour or {1, 1, 1, 1}
+    line.colour = colour or Breadcrumbs.savedVariables.colour or {1, 1, 1, 1}
     return line
 end
 

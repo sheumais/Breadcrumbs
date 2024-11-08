@@ -4,18 +4,17 @@ Breadcrumbs.version = "1.1"
 Breadcrumbs.author = "TheMrPancake"
 
 Breadcrumbs.savedVariablesVersion = 1 -- don't change
+Breadcrumbs.showUI = false
 Breadcrumbs.defaults = {
     linePool = {},
     savedLines = {},
     loc1 = nil,
     loc2 = nil,
+    colour = {1,1,1,1},
 }
 
---------------------------
--- From OdySupportIcons --
---------------------------
 Breadcrumbs.window = GetWindowManager()
-function Breadcrumbs.CreateUI()
+function Breadcrumbs.CreateTopLevelControl()
     Breadcrumbs.ctrl = Breadcrumbs.window:CreateControl( "BreadcrumbsControl", GuiRoot, CT_CONTROL )
     Breadcrumbs.ctrl:SetAnchorFill( GuiRoot )
     Breadcrumbs.ctrl:Create3DRenderSpace()
@@ -41,6 +40,26 @@ function Breadcrumbs.LoadSavedZoneLines(event)
     Breadcrumbs.RefreshLines()
 end
 
+Breadcrumbs.interface = GetControl("Breadcrumbs_Menu_Window") 
+
+function Breadcrumbs.HideUI()
+    Breadcrumbs.interface:SetHidden(true)
+    Breadcrumbs.showUI = false
+end
+
+function Breadcrumbs.ShowUI()
+    Breadcrumbs.interface:SetHidden(false)
+    Breadcrumbs.showUI = true
+end
+
+function Breadcrumbs.ToggleUIVisibility()
+    if (Breadcrumbs.showUI) then
+        Breadcrumbs.HideUI()
+    else 
+        Breadcrumbs.showUI()
+    end
+end
+
 local function OnAddOnLoaded(_, name)
     if name ~= Breadcrumbs.name then return end
     EVENT_MANAGER:UnregisterForEvent(Breadcrumbs.name, EVENT_ADD_ON_LOADED)
@@ -49,13 +68,14 @@ local function OnAddOnLoaded(_, name)
     EVENT_MANAGER:RegisterForEvent(Breadcrumbs.name, EVENT_PLAYER_ACTIVATED, Breadcrumbs.LoadSavedZoneLines)
     
     Breadcrumbs.savedVariables = ZO_SavedVars:NewCharacterIdSettings("BreadcrumbsSavedVariables", Breadcrumbs.savedVariablesVersion, nil, Breadcrumbs.defaults)
-    Breadcrumbs.CreateUI()
+    Breadcrumbs.CreateTopLevelControl()
     Breadcrumbs.ClearLinePool()
-    Breadcrumbs.RefreshLines() 
+    Breadcrumbs.RefreshLines()
     Breadcrumbs.StartPolling()
 
     SLASH_COMMANDS["/loc1"] = Breadcrumbs.Loc1
     SLASH_COMMANDS["/loc2"] = Breadcrumbs.Loc2
+    SLASH_COMMANDS["/breadcrumbs"] = Breadcrumbs.ToggleUIVisibility
 end
 
 EVENT_MANAGER:RegisterForEvent(Breadcrumbs.name, EVENT_ADD_ON_LOADED, OnAddOnLoaded)
