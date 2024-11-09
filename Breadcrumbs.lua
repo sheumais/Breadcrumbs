@@ -5,12 +5,13 @@ Breadcrumbs.author = "TheMrPancake"
 
 Breadcrumbs.savedVariablesVersion = 1 -- don't change
 Breadcrumbs.showUI = false
+Breadcrumbs.ui = {}
 Breadcrumbs.defaults = {
     linePool = {},
     savedLines = {},
     loc1 = nil,
     loc2 = nil,
-    colour = {1,1,1,1},
+    colour = {1,1,1},
 }
 
 Breadcrumbs.window = GetWindowManager()
@@ -40,23 +41,46 @@ function Breadcrumbs.LoadSavedZoneLines(event)
     Breadcrumbs.RefreshLines()
 end
 
-Breadcrumbs.interface = GetControl("Breadcrumbs_Menu_Window") 
+function Breadcrumbs.InitialiseUI()
+    Breadcrumbs.ui.interface = Breadcrumbs_Menu_Window or {}
+    Breadcrumbs.ui.square = Breadcrumbs_Menu_Window_Coloured_Square_Container_Coloured_Square or {}
+
+    Breadcrumbs.ui.square:SetColor(unpack(Breadcrumbs.savedVariables.colour or {1, 1, 1}))
+end
 
 function Breadcrumbs.HideUI()
-    Breadcrumbs.interface:SetHidden(true)
+    Breadcrumbs.ui.interface = Breadcrumbs_Menu_Window or {}
+    Breadcrumbs.ui.interface:SetHidden(true)
     Breadcrumbs.showUI = false
 end
 
 function Breadcrumbs.ShowUI()
-    Breadcrumbs.interface:SetHidden(false)
+    Breadcrumbs.ui.interface = Breadcrumbs_Menu_Window or {}
+    Breadcrumbs.ui.interface:SetHidden(false)
     Breadcrumbs.showUI = true
 end
+
+function Breadcrumbs.SetLineColour(r, g, b)
+    Breadcrumbs.savedVariables.colour = {r, g, b}
+    Breadcrumbs.ui.square:SetColor(r, g, b, 1)
+end
+
+function Breadcrumbs.ShowColourPicker()
+    local color = ZO_ColorDef:New(unpack(Breadcrumbs.savedVariables.colour or {1, 1, 1}))
+    COLOR_PICKER:Show(function(r,g,b) Breadcrumbs.SetLineColour(r, g, b) end, color:UnpackRGB())
+end
+
+function Breadcrumbs.SetLineWhite()   Breadcrumbs.SetLineColour(1, 1, 1) end
+function Breadcrumbs.SetLineMagenta() Breadcrumbs.SetLineColour(1, 0, 1) end
+function Breadcrumbs.SetLineBlue()    Breadcrumbs.SetLineColour(0, 0, 1) end
+function Breadcrumbs.SetLineGreen()   Breadcrumbs.SetLineColour(0, 1, 0) end
+function Breadcrumbs.SetLineRed()     Breadcrumbs.SetLineColour(1, 0, 0) end
 
 function Breadcrumbs.ToggleUIVisibility()
     if (Breadcrumbs.showUI) then
         Breadcrumbs.HideUI()
     else 
-        Breadcrumbs.showUI()
+        Breadcrumbs.ShowUI()
     end
 end
 
@@ -69,6 +93,7 @@ local function OnAddOnLoaded(_, name)
     
     Breadcrumbs.savedVariables = ZO_SavedVars:NewCharacterIdSettings("BreadcrumbsSavedVariables", Breadcrumbs.savedVariablesVersion, nil, Breadcrumbs.defaults)
     Breadcrumbs.CreateTopLevelControl()
+    Breadcrumbs.InitialiseUI()
     Breadcrumbs.ClearLinePool()
     Breadcrumbs.RefreshLines()
     Breadcrumbs.StartPolling()

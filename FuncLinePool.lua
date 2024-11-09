@@ -9,7 +9,7 @@ function Breadcrumbs.CreateLinePrimitive(x1, y1, z1, x2, y2, z2, colour --[[ Nil
         x2 = x2,
         y2 = y2,
         z2 = z2,
-        colour = colour or Breadcrumbs.savedVariables.colour or {1, 1, 1, 1}
+        colour = colour or Breadcrumbs.savedVariables.colour or {1, 1, 1}
     }
 end
 
@@ -46,7 +46,7 @@ function Breadcrumbs.AddLineToPool( x1, y1, z1, x2, y2, z2, colour --[[ Nilable 
     line.use = true
     line.x1, line.y1, line.z1 = x1, y1, z1
     line.x2, line.y2, line.z2 = x2, y2, z2
-    line.colour = colour or Breadcrumbs.savedVariables.colour or {1, 1, 1, 1}
+    line.colour = colour or Breadcrumbs.savedVariables.colour or {1, 1, 1}
     return line
 end
 
@@ -111,9 +111,9 @@ end
 function Breadcrumbs.Generate3DAxisLines() -- /script Breadcrumbs.Generate3DAxisLines() 
     Breadcrumbs.InitialiseZone()
     local zoneId, x, y, z = GetUnitRawWorldPosition("player")
-    table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], Breadcrumbs.CreateLinePrimitive(x, y, z, x + 1000, y, z, {1,0,0,1}))
-    table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], Breadcrumbs.CreateLinePrimitive(x, y, z, x, y + 1000, z, {0,1,0,1}))
-    table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], Breadcrumbs.CreateLinePrimitive(x, y, z, x, y, z + 1000, {0,0,1,1}))
+    table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], Breadcrumbs.CreateLinePrimitive(x, y, z, x + 1000, y, z, {1,0,0}))
+    table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], Breadcrumbs.CreateLinePrimitive(x, y, z, x, y + 1000, z, {0,1,0}))
+    table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], Breadcrumbs.CreateLinePrimitive(x, y, z, x, y, z + 1000, {0,0,1}))
     Breadcrumbs.RefreshLines()
     return zoneId
 end
@@ -136,7 +136,7 @@ function Breadcrumbs.Loc2() -- /script Breadcrumbs.Loc2()
     }
 end
 
-function Breadcrumbs.CreateLineFromLocs(colour) -- /script Breadcrumbs.CreateLineFromLocs({1,0,1,1})
+function Breadcrumbs.CreateLineFromLocs(colour) -- /script Breadcrumbs.CreateLineFromLocs({1,0,1})
     Breadcrumbs.InitialiseZone()
     local zoneId = Breadcrumbs.GetZoneId()
     local loc1 = Breadcrumbs.savedVariables.loc1
