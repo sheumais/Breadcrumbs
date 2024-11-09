@@ -1,4 +1,4 @@
-## Title: |c3CFF80Breadcrumbs|r
+## Title: |cff7f40Breadcrumbs|r
 ## Description: Drawing of lines
 ## Author: TheMrPancake
 ## DependsOn:

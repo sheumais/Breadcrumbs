@@ -43,7 +43,7 @@ end
 
 function Breadcrumbs.InitialiseUI()
     Breadcrumbs.ui.interface = Breadcrumbs_Menu_Window or {}
-    Breadcrumbs.ui.square = Breadcrumbs_Menu_Window_Coloured_Square_Container_Coloured_Square or {}
+    Breadcrumbs.ui.square = Breadcrumbs_Menu_Window_Coloured_Square or {}
 
     Breadcrumbs.ui.square:SetColor(unpack(Breadcrumbs.savedVariables.colour or {1, 1, 1}))
 end

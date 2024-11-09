@@ -1,6 +1,6 @@
 <GuiXml>
     <Controls>
-        <TopLevelControl name="Breadcrumbs_Menu_Window" clampedToScreen="true" mouseEnabled="true" movable="true" hidden="false" >
+        <TopLevelControl name="Breadcrumbs_Menu_Window" clampedToScreen="true" mouseEnabled="true" movable="true" hidden="true" >
             <Anchor point="BOTTOM" relativeTo="GuiRoot" relativePoint="CENTER" offsetY="-150" />
             <Dimensions x="400" y="250" />
             <Controls>
@@ -77,14 +77,8 @@
                                 Breadcrumbs.SetLineGreen()
                             </OnClicked>
                         </Button>
-                        <Button name="$(parent)_Blue_Button" text="Blue" inherits="ZO_DefaultButton">
-                            <Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(parent)_Green_Button" offsetY="-6" />
-                            <OnClicked>
-                                Breadcrumbs.SetLineBlue()
-                            </OnClicked>
-                        </Button>
                         <Button name="$(parent)_Magenta_Button" text="Magenta" inherits="ZO_DefaultButton">
-                            <Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(parent)_Blue_Button" offsetY="-6" />
+                            <Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(parent)_Green_Button" offsetY="-6" />
                             <OnClicked>
                                 Breadcrumbs.SetLineMagenta()
                             </OnClicked>

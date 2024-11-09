@@ -97,17 +97,6 @@ function Breadcrumbs.CreateSavedZoneLine(x1, y1, z1, x2, y2, z2, colour --[[ Nil
     return zoneId
 end
 
-function Breadcrumbs.CreatedSavedZoneLineByOffset(xo, yo, zo, colour --[[ Nilable --]] ) -- /script Breadcrumbs.CreatedSavedZoneLineByOffset(1000, 0, 0, nil)
-    Breadcrumbs.InitialiseZone()
-    local zoneId, x, y, z = GetUnitRawWorldPosition("player")
-    local line = Breadcrumbs.CreateLinePrimitive(x, y, z, x + xo, y + yo, z + zo, colour)
-    if line then 
-        table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], line)
-    end
-    Breadcrumbs.RefreshLines()
-    return zoneId
-end
-
 function Breadcrumbs.Generate3DAxisLines() -- /script Breadcrumbs.Generate3DAxisLines() 
     Breadcrumbs.InitialiseZone()
     local zoneId, x, y, z = GetUnitRawWorldPosition("player")
@@ -141,6 +130,8 @@ function Breadcrumbs.CreateLineFromLocs(colour) -- /script Breadcrumbs.CreateLin
     local zoneId = Breadcrumbs.GetZoneId()
     local loc1 = Breadcrumbs.savedVariables.loc1
     local loc2 = Breadcrumbs.savedVariables.loc2
+    if not loc1 or not loc2 then return end
+    if loc1 == loc2 then return end
     local line = Breadcrumbs.CreateLinePrimitive(loc1.x, loc1.y, loc1.z, loc2.x, loc2.y, loc2.z, colour)
     if line then
         table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], line)
@@ -148,6 +139,38 @@ function Breadcrumbs.CreateLineFromLocs(colour) -- /script Breadcrumbs.CreateLin
     Breadcrumbs.RefreshLines()
     return zoneId
 end
+
+function Breadcrumbs.CreateCircle(r, N, colour) -- /script Breadcrumbs.CreateCircle(10, 16, {1, 0.5, 0})
+    if N < 3 then return end  -- A circle needs at least 3 points (triangle) to form a polygon
+    Breadcrumbs.InitialiseZone()
+    local zoneId, playerX, playerY, playerZ = GetUnitRawWorldPosition("player")
+    local radius = r * 100 -- Convert from metres to in-game units
+
+    local points = {}
+    -- Generate N points along the circle's circumference
+    for i = 1, N do
+        local angle = (2 * math.pi / N) * i
+        local x = playerX + radius * math.cos(angle)
+        local y = playerY
+        local z = playerZ + radius * math.sin(angle)
+
+        table.insert(points, {x = x, y = y, z = z})
+    end
+
+    -- Create lines between consecutive points (close the circle by connecting the last point to the first)
+    for i = 1, N do
+        local startPoint = points[i]
+        local endPoint = points[i % N + 1]  -- Modulo N to wrap around to the first point
+        local line = Breadcrumbs.CreateLinePrimitive(startPoint.x, startPoint.y, startPoint.z, endPoint.x, endPoint.y, endPoint.z, colour)
+        if line then
+            table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], line)
+        end
+    end
+
+    Breadcrumbs.RefreshLines()
+    return zoneId
+end
+
 
 local function squaredDistance(x1, y1, z1, x2, y2, z2)
     local dx = x2 - x1
@@ -176,6 +199,8 @@ function Breadcrumbs.RemoveClosestLine() -- /script Breadcrumbs.RemoveClosestLin
     end
 
     if closest_line_index then
+        local closest_line = lines[closest_line_index]
+        Breadcrumbs.DiscardLine(closest_line)
         table.remove(Breadcrumbs.savedVariables.savedLines[zoneId], closest_line_index)
     end
     Breadcrumbs.RefreshLines()
