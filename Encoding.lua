@@ -9,9 +9,11 @@ Breadcrumbs = Breadcrumbs or {}
 --
 -- zoneid is a single value denoting the zone to which the lines belong
 --
--- origin is three values (x, y, z) that each are the minimum x y and z value
+-- origin is three values (x, y, z) 
+-- calculated as the lowest value of (X/Y/Z) of all the points in the point table
 -- this is used to encode points as a difference from this origin to turn values
 -- such as 224013 into 4013 for example, saving a lot of string length
+-- also ensures that all position values in the string are positive
 --
 -- colour table is a table holding all the colours of all the lines
 -- it is preceded by the length of the table, and is used to encode line colour as an index  
@@ -25,6 +27,7 @@ Breadcrumbs = Breadcrumbs or {}
 -- lines are encoded as a colour index, followed by the indicies of two points from the point table
 -- it is preceded by the number of lines, but this just a sanity check
 ------------------------------------------------
+-- /script Breadcrumbs.DecodeStringToZoneLines(Breadcrumbs.EncodeZoneLinesToString(1000))
 function Breadcrumbs.EncodeZoneLinesToString(zoneId) -- /script d(Breadcrumbs.EncodeZoneLinesToString(1000))
     local lines = Breadcrumbs.GetSavedZoneLines(zoneId)
     if #lines == 0 then return "" end
@@ -141,3 +144,71 @@ end
 --
 -- This string creates a set of coloured 3d axis near the Writing Wastes wayshrine in Apocrypha
 ------------------------------------------------
+
+local function hexToRGB(hex)
+    local r = math.floor(hex / 0x10000)
+    local g = math.floor((hex % 0x10000) / 0x100)
+    local b = hex % 0x100
+    return r, g, b
+end
+
+function Breadcrumbs.DecodeStringToZoneLines(encodedString) -- /script d(Breadcrumbs.DecodeStringToZoneLines(Breadcrumbs.EncodeZoneLinesToString(1000)))
+    local segments = encodedString:gmatch("([^;]+)")
+
+    local function nextHex()
+        return tonumber(segments(), 16)
+    end
+
+    local function nextString()
+        return segments()
+    end
+
+    local zoneId = nextHex()
+    local min_x = nextHex()
+    local min_y = nextHex()
+    local min_z = nextHex()
+
+    local colour_count = nextHex()
+    local colour_table_indexes = {}
+    for i = 1, colour_count do
+        local hex_colour = nextString()
+        local colour_hex = tonumber(hex_colour, 16)
+        local r, g, b = hexToRGB(colour_hex)
+        colour_table_indexes[i] = {r / 255, g / 255, b / 255}
+    end
+
+    local point_count = nextHex()
+    local points = {}
+    for i = 1, point_count do
+        local x = nextHex()
+        local y = nextHex()
+        local z = nextHex()
+        points[i] = {x = x, y = y, z = z}
+    end
+
+    local line_count = nextHex()
+    local lines = {}
+    for i = 1, line_count do
+        local colour_index = nextHex()
+        local point1_index = nextHex()
+        local point2_index = nextHex()
+
+        local colour = colour_table_indexes[colour_index]
+        local point1 = points[point1_index]
+        local point2 = points[point2_index]
+
+        local x1 = point1.x + min_x
+        local y1 = point1.y + min_y
+        local z1 = point1.z + min_z
+        local x2 = point2.x + min_x
+        local y2 = point2.y + min_y
+        local z2 = point2.z + min_z
+
+        table.insert(lines, {
+            x1 = x1, y1 = y1, z1 = z1,
+            x2 = x2, y2 = y2, z2 = z2,
+            colour = colour
+        })
+    end
+    return lines
+end
