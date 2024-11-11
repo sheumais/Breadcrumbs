@@ -9,7 +9,7 @@ function Breadcrumbs.CreateLinePrimitive(x1, y1, z1, x2, y2, z2, colour --[[ Nil
         x2 = x2,
         y2 = y2,
         z2 = z2,
-        colour = colour or Breadcrumbs.savedVariables.colour or {1, 1, 1}
+        colour = colour or Breadcrumbs.sV.colour or {1, 1, 1}
     }
 end
 
@@ -46,7 +46,7 @@ function Breadcrumbs.AddLineToPool( x1, y1, z1, x2, y2, z2, colour --[[ Nilable 
     line.use = true
     line.x1, line.y1, line.z1 = x1, y1, z1
     line.x2, line.y2, line.z2 = x2, y2, z2
-    line.colour = colour or Breadcrumbs.savedVariables.colour or {1, 1, 1}
+    line.colour = colour or Breadcrumbs.sV.colour or {1, 1, 1}
     return line
 end
 
@@ -55,11 +55,11 @@ function Breadcrumbs.DiscardLine(line)
 end
 
 function Breadcrumbs.GetLinePool()
-    return Breadcrumbs.savedVariables.linePool or {}
+    return Breadcrumbs.sV.linePool or {}
 end
 
 function Breadcrumbs.ClearLinePool()
-    Breadcrumbs.savedVariables.linePool = {}
+    Breadcrumbs.sV.linePool = {}
 end
 
 -- Lines don't simply vanish from the screen when we remove savedVariables data
@@ -74,16 +74,16 @@ function Breadcrumbs.NilLinePool()
 end
 
 function Breadcrumbs.GetSavedZoneLines(zoneId)
-    return Breadcrumbs.savedVariables.savedLines[zoneId] or {}
+    return Breadcrumbs.sV.savedLines[zoneId] or {}
 end
 
 function Breadcrumbs.ClearSavedZoneLines(zoneId)
-    Breadcrumbs.savedVariables.savedLines[zoneId] = {}
+    Breadcrumbs.sV.savedLines[zoneId] = {}
 end
 
 function Breadcrumbs.InitialiseZone()
     local zoneId = Breadcrumbs.GetZoneId()
-    Breadcrumbs.savedVariables.savedLines[zoneId] = Breadcrumbs.GetSavedZoneLines(zoneId)
+    Breadcrumbs.sV.savedLines[zoneId] = Breadcrumbs.GetSavedZoneLines(zoneId)
 end
 
 function Breadcrumbs.CreateSavedZoneLine(x1, y1, z1, x2, y2, z2, colour --[[ Nilable --]] )
@@ -91,7 +91,7 @@ function Breadcrumbs.CreateSavedZoneLine(x1, y1, z1, x2, y2, z2, colour --[[ Nil
     local zoneId = Breadcrumbs.GetZoneId()
     local line = Breadcrumbs.CreateLinePrimitive(x1, y1, z1, x2, y2, z2, colour)
     if line then 
-        table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], line)
+        table.insert(Breadcrumbs.sV.savedLines[zoneId], line)
     end    
     Breadcrumbs.RefreshLines()
     return zoneId
@@ -100,16 +100,16 @@ end
 function Breadcrumbs.Generate3DAxisLines() -- /script Breadcrumbs.Generate3DAxisLines() 
     Breadcrumbs.InitialiseZone()
     local zoneId, x, y, z = GetUnitRawWorldPosition("player")
-    table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], Breadcrumbs.CreateLinePrimitive(x, y, z, x + 1000, y, z, {1,0,0}))
-    table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], Breadcrumbs.CreateLinePrimitive(x, y, z, x, y + 1000, z, {0,1,0}))
-    table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], Breadcrumbs.CreateLinePrimitive(x, y, z, x, y, z + 1000, {0,0,1}))
+    table.insert(Breadcrumbs.sV.savedLines[zoneId], Breadcrumbs.CreateLinePrimitive(x, y, z, x + 1000, y, z, {1,0,0}))
+    table.insert(Breadcrumbs.sV.savedLines[zoneId], Breadcrumbs.CreateLinePrimitive(x, y, z, x, y + 1000, z, {0,1,0}))
+    table.insert(Breadcrumbs.sV.savedLines[zoneId], Breadcrumbs.CreateLinePrimitive(x, y, z, x, y, z + 1000, {0,0,1}))
     Breadcrumbs.RefreshLines()
     return zoneId
 end
 
 function Breadcrumbs.Loc1() -- /script Breadcrumbs.Loc1()
     local _, x, y, z = GetUnitRawWorldPosition("player")
-    Breadcrumbs.savedVariables.loc1 = {
+    Breadcrumbs.sV.loc1 = {
         x = x,
         y = y,
         z = z
@@ -118,7 +118,7 @@ end
 
 function Breadcrumbs.Loc2() -- /script Breadcrumbs.Loc2()
     local _, x, y, z = GetUnitRawWorldPosition("player")
-    Breadcrumbs.savedVariables.loc2 = {
+    Breadcrumbs.sV.loc2 = {
         x = x,
         y = y,
         z = z
@@ -128,13 +128,13 @@ end
 function Breadcrumbs.CreateLineFromLocs(colour) -- /script Breadcrumbs.CreateLineFromLocs({1,0,1})
     Breadcrumbs.InitialiseZone()
     local zoneId = Breadcrumbs.GetZoneId()
-    local loc1 = Breadcrumbs.savedVariables.loc1
-    local loc2 = Breadcrumbs.savedVariables.loc2
+    local loc1 = Breadcrumbs.sV.loc1
+    local loc2 = Breadcrumbs.sV.loc2
     if not loc1 or not loc2 then return end
     if loc1 == loc2 then return end
     local line = Breadcrumbs.CreateLinePrimitive(loc1.x, loc1.y, loc1.z, loc2.x, loc2.y, loc2.z, colour)
     if line then
-        table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], line)
+        table.insert(Breadcrumbs.sV.savedLines[zoneId], line)
     end
     Breadcrumbs.RefreshLines()
     return zoneId
@@ -159,11 +159,11 @@ function Breadcrumbs.CreateCircle(r, N, colour) -- /script Breadcrumbs.CreateCir
 
     -- Create lines between consecutive points (close the circle by connecting the last point to the first)
     for i = 1, N do
-        local startPoint = points[i]
-        local endPoint = points[i % N + 1]  -- Modulo N to wrap around to the first point
-        local line = Breadcrumbs.CreateLinePrimitive(startPoint.x, startPoint.y, startPoint.z, endPoint.x, endPoint.y, endPoint.z, colour)
+        local sP = points[i]
+        local eP = points[i % N + 1]  -- Modulo N to wrap around to the first point
+        local line = Breadcrumbs.CreateLinePrimitive(sP.x, sP.y, sP.z, eP.x, eP.y, eP.z, colour or Breadcrumbs.sV.colour or {1, 1, 1})
         if line then
-            table.insert(Breadcrumbs.savedVariables.savedLines[zoneId], line)
+            table.insert(Breadcrumbs.sV.savedLines[zoneId], line)
         end
     end
 
@@ -201,7 +201,7 @@ function Breadcrumbs.RemoveClosestLine() -- /script Breadcrumbs.RemoveClosestLin
     if closest_line_index then
         local closest_line = lines[closest_line_index]
         Breadcrumbs.DiscardLine(closest_line)
-        table.remove(Breadcrumbs.savedVariables.savedLines[zoneId], closest_line_index)
+        table.remove(Breadcrumbs.sV.savedLines[zoneId], closest_line_index)
     end
     Breadcrumbs.RefreshLines()
 end

@@ -2,6 +2,7 @@ Breadcrumbs = Breadcrumbs or {}
 Breadcrumbs.name = "Breadcrumbs"
 Breadcrumbs.version = "1.1"
 Breadcrumbs.author = "TheMrPancake"
+Breadcrumbs.title = "|cff7f40BREADCRUMBS|r"
 
 Breadcrumbs.savedVariablesVersion = 1 -- don't change
 Breadcrumbs.showUI = false
@@ -45,7 +46,8 @@ function Breadcrumbs.InitialiseUI()
     Breadcrumbs.ui.interface = Breadcrumbs_Menu_Window or {}
     Breadcrumbs.ui.square = Breadcrumbs_Menu_Window_Coloured_Square or {}
 
-    Breadcrumbs.ui.square:SetColor(unpack(Breadcrumbs.savedVariables.colour or {1, 1, 1}))
+    Breadcrumbs.ui.square:SetColor(unpack(Breadcrumbs.sV.colour or {1, 1, 1}))
+    Breadcrumbs.showUI = false
 end
 
 function Breadcrumbs.HideUI()
@@ -61,12 +63,12 @@ function Breadcrumbs.ShowUI()
 end
 
 function Breadcrumbs.SetLineColour(r, g, b)
-    Breadcrumbs.savedVariables.colour = {r, g, b}
+    Breadcrumbs.sV.colour = {r, g, b}
     Breadcrumbs.ui.square:SetColor(r, g, b, 1)
 end
 
 function Breadcrumbs.ShowColourPicker()
-    local color = ZO_ColorDef:New(unpack(Breadcrumbs.savedVariables.colour or {1, 1, 1}))
+    local color = ZO_ColorDef:New(unpack(Breadcrumbs.sV.colour or {1, 1, 1}))
     COLOR_PICKER:Show(function(r,g,b) Breadcrumbs.SetLineColour(r, g, b) end, color:UnpackRGB())
 end
 
@@ -79,7 +81,7 @@ function Breadcrumbs.SetLineRed()     Breadcrumbs.SetLineColour(1, 0, 0) end
 function Breadcrumbs.ToggleUIVisibility()
     if (Breadcrumbs.showUI) then
         Breadcrumbs.HideUI()
-    else 
+    else
         Breadcrumbs.ShowUI()
     end
 end
@@ -91,9 +93,10 @@ local function OnAddOnLoaded(_, name)
     EVENT_MANAGER:RegisterForEvent(Breadcrumbs.name, EVENT_ZONE_CHANGED, Breadcrumbs.LoadSavedZoneLines)
     EVENT_MANAGER:RegisterForEvent(Breadcrumbs.name, EVENT_PLAYER_ACTIVATED, Breadcrumbs.LoadSavedZoneLines)
     
-    Breadcrumbs.savedVariables = ZO_SavedVars:NewCharacterIdSettings("BreadcrumbsSavedVariables", Breadcrumbs.savedVariablesVersion, nil, Breadcrumbs.defaults)
+    Breadcrumbs.sV = ZO_SavedVars:NewCharacterIdSettings("BreadcrumbsSavedVariables", Breadcrumbs.savedVariablesVersion, nil, Breadcrumbs.defaults)
     Breadcrumbs.CreateTopLevelControl()
     Breadcrumbs.InitialiseUI()
+    --Breadcrumbs.RegisterSettingsPanel()
     Breadcrumbs.ClearLinePool()
     Breadcrumbs.RefreshLines()
     Breadcrumbs.StartPolling()

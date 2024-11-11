@@ -1,7 +1,7 @@
 ## Title: |cff7f40Breadcrumbs|r
 ## Description: Drawing of lines
 ## Author: TheMrPancake
-## DependsOn:
+## DependsOn: LibAddonMenu-2.0>=37
 ## APIVersion: 101044
 ## AddOnVersion: 1.1
 ## SavedVariables: BreadcrumbsSavedVariables
@@ -16,3 +16,5 @@ Breadcrumbs.lua
 Draw.lua
 FuncLinePool.lua
 Breadcrumbs.xml
+Settings.lua
+Encoding.lua
