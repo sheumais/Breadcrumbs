@@ -39,7 +39,7 @@ function Breadcrumbs.AddLineToPool( x1, y1, z1, x2, y2, z2, colour --[[ Nilable 
     end
     -- create a new line if no unused line is available
     if not line then
-        line = Breadcrumbs.CreateLineControl( "BreadcrumbsLine" .. #linePool )
+        line = Breadcrumbs.CreateLineControl( "BreadcrumbsLine" .. (#linePool+1) )
         linePool[#linePool + 1] = line
     end
     -- store line data
@@ -69,7 +69,7 @@ end
 function Breadcrumbs.NilLinePool()
     local linePool = Breadcrumbs.GetLinePool()
     for _, line in pairs( linePool ) do
-        line.use = false
+        Breadcrumbs.DiscardLine(line)
     end
 end
 
@@ -79,6 +79,12 @@ end
 
 function Breadcrumbs.ClearSavedZoneLines(zoneId)
     Breadcrumbs.sV.savedLines[zoneId] = {}
+    Breadcrumbs.RefreshLines()
+end
+
+function Breadcrumbs.ClearSavedZoneLinesFromThisZone()
+    local zoneId = Breadcrumbs.GetZoneId()
+    Breadcrumbs.ClearSavedZoneLines(zoneId)
 end
 
 function Breadcrumbs.InitialiseZone()
@@ -140,16 +146,15 @@ function Breadcrumbs.CreateLineFromLocs(colour) -- /script Breadcrumbs.CreateLin
     return zoneId
 end
 
-function Breadcrumbs.CreateCircle(r, N, colour) -- /script Breadcrumbs.CreateCircle(10, 16, {1, 0.5, 0})
-    if N < 3 then return end  -- A circle needs at least 3 points (triangle) to form a polygon
+function Breadcrumbs.CreateCircle(r, n, colour) -- /script Breadcrumbs.CreateCircle(10, 16, {1, 0.5, 0})
+    if n < 3 then return end
     Breadcrumbs.InitialiseZone()
     local zoneId, playerX, playerY, playerZ = GetUnitRawWorldPosition("player")
     local radius = r * 100 -- Convert from metres to in-game units
 
     local points = {}
-    -- Generate N points along the circle's circumference
-    for i = 1, N do
-        local angle = (2 * math.pi / N) * i
+    for i = 1, n do
+        local angle = (2 * math.pi / n) * i
         local x = playerX + radius * math.cos(angle)
         local y = playerY
         local z = playerZ + radius * math.sin(angle)
@@ -157,10 +162,9 @@ function Breadcrumbs.CreateCircle(r, N, colour) -- /script Breadcrumbs.CreateCir
         table.insert(points, {x = x, y = y, z = z})
     end
 
-    -- Create lines between consecutive points (close the circle by connecting the last point to the first)
-    for i = 1, N do
+    for i = 1, n do
         local sP = points[i]
-        local eP = points[i % N + 1]  -- Modulo N to wrap around to the first point
+        local eP = points[i % n + 1]
         local line = Breadcrumbs.CreateLinePrimitive(sP.x, sP.y, sP.z, eP.x, eP.y, eP.z, colour or Breadcrumbs.sV.colour or {1, 1, 1})
         if line then
             table.insert(Breadcrumbs.sV.savedLines[zoneId], line)
@@ -171,6 +175,11 @@ function Breadcrumbs.CreateCircle(r, N, colour) -- /script Breadcrumbs.CreateCir
     return zoneId
 end
 
+function Breadcrumbs.PopulateZoneLinesFromTable(zoneId, lines)
+    for _, line in pairs(lines) do
+        table.insert(Breadcrumbs.sV.savedLines[zoneId], line)
+    end
+end
 
 local function squaredDistance(x1, y1, z1, x2, y2, z2)
     local dx = x2 - x1
@@ -218,5 +227,10 @@ function Breadcrumbs.RefreshLines()
     Breadcrumbs.StopPolling()
     Breadcrumbs.NilLinePool()
     Breadcrumbs.GenerateSavedLines()
-    Breadcrumbs.StartPolling()
+    Breadcrumbs.UpdateExportString()
+    if Breadcrumbs.sV.enabled then 
+        Breadcrumbs.StartPolling()
+    else 
+        Breadcrumbs.HideAllLines()
+    end
 end

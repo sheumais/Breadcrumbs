@@ -1,8 +1,8 @@
 Breadcrumbs = Breadcrumbs or {}
 Breadcrumbs.name = "Breadcrumbs"
-Breadcrumbs.version = "1.1"
+Breadcrumbs.version = "1.0"
 Breadcrumbs.author = "TheMrPancake"
-Breadcrumbs.title = "|cff7f40BREADCRUMBS|r"
+Breadcrumbs.title = "|cff7f40Breadcrumbs|r"
 
 Breadcrumbs.savedVariablesVersion = 1 -- don't change
 Breadcrumbs.showUI = false
@@ -13,6 +13,11 @@ Breadcrumbs.defaults = {
     loc1 = nil,
     loc2 = nil,
     colour = {1,1,1},
+    enabled = true,
+    width = 6,
+    alpha = 1,
+    importString = "",
+    exportString = "",
 }
 
 Breadcrumbs.window = GetWindowManager()
@@ -48,6 +53,7 @@ function Breadcrumbs.InitialiseUI()
 
     Breadcrumbs.ui.square:SetColor(unpack(Breadcrumbs.sV.colour or {1, 1, 1}))
     Breadcrumbs.showUI = false
+    Breadcrumbs.sV.importString = ""
 end
 
 function Breadcrumbs.HideUI()
@@ -96,7 +102,7 @@ local function OnAddOnLoaded(_, name)
     Breadcrumbs.sV = ZO_SavedVars:NewCharacterIdSettings("BreadcrumbsSavedVariables", Breadcrumbs.savedVariablesVersion, nil, Breadcrumbs.defaults)
     Breadcrumbs.CreateTopLevelControl()
     Breadcrumbs.InitialiseUI()
-    --Breadcrumbs.RegisterSettingsPanel()
+    Breadcrumbs.RegisterSettingsPanel()
     Breadcrumbs.ClearLinePool()
     Breadcrumbs.RefreshLines()
     Breadcrumbs.StartPolling()

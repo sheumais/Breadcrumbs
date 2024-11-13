@@ -71,21 +71,22 @@ local function GetViewCoordinates(wX, wY, wZ)
 
     local dX, dY, dZ = wX - cX, wY - cY, wZ - cZ
     local dist = 1 + zo_sqrt( dX * dX + dY * dY + dZ * dZ )
-    local scale = 1000 / dist or 1
+    local scale = 2000 / dist or 1
 
     return pX * uiW / w, -pY * uiH / h, pZ > 0, scale
 end
 
 function Breadcrumbs.DrawLine(x1, y1, x2, y2, line, scale)
     line.backdrop:SetAnchorFill()
-    line.backdrop:SetCenterColor(unpack(line.colour))
-    line.backdrop:SetEdgeColor(unpack(line.colour))
+    local r, g, b = unpack(line.colour)
+    line.backdrop:SetCenterColor(r, g, b, Breadcrumbs.sV.alpha)
+    line.backdrop:SetEdgeColor(0,0,0,0)
     line.lineControl:ClearAnchors()
     line.lineControl:SetAnchor(CENTER, GuiRoot, CENTER, (x1 + x2) / 2, (y1 + y2) / 2)
     local x = x2 - x1
     local y = y2 - y1
     local length = math.sqrt(x*x + y*y)
-    line.lineControl:SetDimensions(length, 8 * scale)
+    line.lineControl:SetDimensions(length, Breadcrumbs.sV.width * scale)
     local angle = math.atan(y/x)
     line.lineControl:SetTransformRotationZ(-angle)
 end
@@ -93,10 +94,11 @@ end
 function Breadcrumbs.DrawAllLines()
     local linePool = Breadcrumbs.GetLinePool()
     for _, line in pairs( linePool ) do
-        if line.lineControl and line.use ~= true then line.lineControl:SetHidden(true) break end
         local x1, y1, visible1, scale1 = GetViewCoordinates(line.x1, line.y1, line.z1)
         local x2, y2, visible2, scale2 = GetViewCoordinates(line.x2, line.y2, line.z2)
         local scale = math.max(scale1, scale2)
+        if line.use ~= true then visible1 = false visible2 = false end
+        if scale < ( 1. / Breadcrumbs.sV.width ) then visible1 = false visible2 = false end -- fade out far away lines
 
         if (not visible1 and not visible2) then
             line.lineControl:SetHidden(true)
@@ -104,5 +106,12 @@ function Breadcrumbs.DrawAllLines()
             line.lineControl:SetHidden(false)
             Breadcrumbs.DrawLine(x1, y1, x2, y2, line, scale)
         end
+    end
+end
+
+function Breadcrumbs.HideAllLines()
+    local linePool = Breadcrumbs.GetLinePool()
+    for _, line in pairs( linePool ) do
+        line.lineControl:SetHidden(true) 
     end
 end
