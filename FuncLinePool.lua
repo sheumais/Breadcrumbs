@@ -146,7 +146,7 @@ function Breadcrumbs.CreateLineFromLocs(colour) -- /script Breadcrumbs.CreateLin
     return zoneId
 end
 
-function Breadcrumbs.CreateCircle(r, n, colour) -- /script Breadcrumbs.CreateCircle(10, 16, {1, 0.5, 0})
+function Breadcrumbs.DrawPolygon(r, n, colour)
     if n < 3 then return end
     Breadcrumbs.InitialiseZone()
     local zoneId, playerX, playerY, playerZ = GetUnitRawWorldPosition("player")

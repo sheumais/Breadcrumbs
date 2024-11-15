@@ -93,10 +93,13 @@ end
 
 function Breadcrumbs.DrawAllLines()
     local linePool = Breadcrumbs.GetLinePool()
+    -- local _, x, y, z = GetUnitRawWorldPosition("player")
     for _, line in pairs( linePool ) do
         local x1, y1, visible1, scale1 = GetViewCoordinates(line.x1, line.y1, line.z1)
         local x2, y2, visible2, scale2 = GetViewCoordinates(line.x2, line.y2, line.z2)
         local scale = math.max(scale1, scale2)
+        -- local maxYDistance = 1 + math.min(math.abs(y - line.y1), math.abs(y - line.y2)) / 500
+        -- scale = math.min(scale * (1 / maxYDistance), 1)
         if line.use ~= true then visible1 = false visible2 = false end
         if scale < ( 1. / Breadcrumbs.sV.width ) then visible1 = false visible2 = false end -- fade out far away lines
 

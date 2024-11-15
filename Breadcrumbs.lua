@@ -18,6 +18,8 @@ Breadcrumbs.defaults = {
     alpha = 1,
     importString = "",
     exportString = "",
+    polygon_radius = 5,
+    polygon_sides = 8,
 }
 
 Breadcrumbs.window = GetWindowManager()
@@ -107,8 +109,6 @@ local function OnAddOnLoaded(_, name)
     Breadcrumbs.RefreshLines()
     Breadcrumbs.StartPolling()
 
-    SLASH_COMMANDS["/loc1"] = Breadcrumbs.Loc1
-    SLASH_COMMANDS["/loc2"] = Breadcrumbs.Loc2
     SLASH_COMMANDS["/breadcrumbs"] = Breadcrumbs.ToggleUIVisibility
 end
 

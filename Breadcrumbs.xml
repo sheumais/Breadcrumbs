@@ -46,13 +46,13 @@
                             </OnClicked>
                         </Button>
                         
-                        <Button name="$(parent)_Loc2" text="Loc2" inherits="ZO_DefaultButton">
+                        <Button name="$(parent)_Loc2" text="Save Loc2" inherits="ZO_DefaultButton">
                             <Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT" relativeTo="$(parent)_Place_Button" offsetY="-6"/>
                             <OnClicked>
                                 Breadcrumbs.Loc2()
                             </OnClicked>
                         </Button>
-                        <Button name="$(parent)_Loc1" text="Loc1" inherits="ZO_DefaultButton">
+                        <Button name="$(parent)_Loc1" text="Save Loc1" inherits="ZO_DefaultButton">
                             <Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT" relativeTo="$(parent)_Loc2" offsetY="-6"/>
                             <OnClicked>
                                 Breadcrumbs.Loc1()

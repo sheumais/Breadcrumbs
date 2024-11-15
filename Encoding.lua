@@ -152,67 +152,6 @@ local function hexToRGB(hex)
     return r, g, b
 end
 
-function Breadcrumbs.DecodeStringToZoneLines(encodedString) -- /script d(Breadcrumbs.DecodeStringToZoneLines(Breadcrumbs.EncodeZoneLinesToString(1000)))
-    local segments = string.gmatch(encodedString, "([^;]+)")
-
-    local function nextHex()
-        return tonumber(segments(), 16)
-    end
-
-    local function nextString()
-        return segments()
-    end
-
-    local zoneId = nextHex()
-    local min_x = nextHex()
-    local min_y = nextHex()
-    local min_z = nextHex()
-
-    local colour_count = nextHex()
-    local colour_table_indexes = {}
-    for i = 1, colour_count do
-        local hex_colour = nextString()
-        local colour_hex = tonumber(hex_colour, 16)
-        local r, g, b = hexToRGB(colour_hex)
-        colour_table_indexes[i] = {r / 255, g / 255, b / 255}
-    end
-
-    local point_count = nextHex()
-    local points = {}
-    for i = 1, point_count do
-        local x = nextHex()
-        local y = nextHex()
-        local z = nextHex()
-        points[i] = {x = x, y = y, z = z}
-    end
-
-    local line_count = nextHex()
-    local lines = {}
-    for i = 1, line_count do
-        local colour_index = nextHex()
-        local point1_index = nextHex()
-        local point2_index = nextHex()
-
-        local colour = colour_table_indexes[colour_index]
-        local point1 = points[point1_index]
-        local point2 = points[point2_index]
-
-        local x1 = point1.x + min_x
-        local y1 = point1.y + min_y
-        local z1 = point1.z + min_z
-        local x2 = point2.x + min_x
-        local y2 = point2.y + min_y
-        local z2 = point2.z + min_z
-
-        table.insert(lines, {
-            x1 = x1, y1 = y1, z1 = z1,
-            x2 = x2, y2 = y2, z2 = z2,
-            colour = colour
-        })
-    end
-    return zoneId, lines
-end
-
 function Breadcrumbs.DecodeImportStringToZoneLines()
     local segments = string.gmatch(Breadcrumbs.sV.importString, "([^;]+)")
 
