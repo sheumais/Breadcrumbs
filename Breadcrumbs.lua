@@ -49,13 +49,42 @@ function Breadcrumbs.LoadSavedZoneLines(event)
     Breadcrumbs.RefreshLines()
 end
 
+Breadcrumbs.colour_palette = {
+    {name = "Red", colour = {1, 0, 0}},
+    {name = "Orange", colour = {1, 0.5, 0}},
+    {name = "Yellow", colour = {1, 1, 0}},
+    {name = "Green", colour = {0, 1, 0}},
+    {name = "Light Blue", colour = {0, 1, 1}},
+    {name = "Blue", colour = {0, 0, 1}},
+    {name = "Violet", colour = {0.5, 0, 1}},
+    {name = "Magenta", colour = {1, 0, 0.5}},
+    {name = "White", colour = {1, 1, 1}},
+    {name = "Black", colour = {0, 0, 0}},
+}
+
+function Breadcrumbs.SelectColourFromPalette(_, entryText, entry)
+    local colour = Breadcrumbs.colour_palette[entry.colour_index].colour
+    Breadcrumbs.SetLineColour(unpack(colour))
+end
+
 function Breadcrumbs.InitialiseUI()
     Breadcrumbs.ui.interface = Breadcrumbs_Menu_Window or {}
     Breadcrumbs.ui.square = Breadcrumbs_Menu_Window_Coloured_Square or {}
+    Breadcrumbs.ui.colour = Breadcrumbs_Menu_Window_Colour or {}
+    local colour_selection_control = Breadcrumbs.ui.colour:GetNamedChild("_Selection")
+    Breadcrumbs.ui.combobox = ZO_ComboBox_ObjectFromContainer(colour_selection_control)
+    Breadcrumbs.ui.combobox:SetSortsItems(false)
+    Breadcrumbs.ui.combobox:SetDropdownFont("ZoFontHeader")
+    Breadcrumbs.ui.combobox:SetSpacing(8)
 
     Breadcrumbs.ui.square:SetColor(unpack(Breadcrumbs.sV.colour or {1, 1, 1}))
     Breadcrumbs.showUI = false
     Breadcrumbs.sV.importString = ""
+    for i, colour in ipairs( Breadcrumbs.colour_palette ) do
+        local entry = Breadcrumbs.ui.combobox:CreateItemEntry(colour.name, Breadcrumbs.SelectColourFromPalette, true)
+        entry.colour_index = i
+        Breadcrumbs.ui.combobox:AddItem(entry)
+    end
 end
 
 function Breadcrumbs.HideUI()
@@ -76,15 +105,9 @@ function Breadcrumbs.SetLineColour(r, g, b)
 end
 
 function Breadcrumbs.ShowColourPicker()
-    local color = ZO_ColorDef:New(unpack(Breadcrumbs.sV.colour or {1, 1, 1}))
-    COLOR_PICKER:Show(function(r,g,b) Breadcrumbs.SetLineColour(r, g, b) end, color:UnpackRGB())
+    local colour = ZO_ColorDef:New(unpack(Breadcrumbs.sV.colour or {1, 1, 1}))
+    COLOR_PICKER:Show(function(r,g,b) Breadcrumbs.SetLineColour(r, g, b) end, colour:UnpackRGB())
 end
-
-function Breadcrumbs.SetLineWhite()   Breadcrumbs.SetLineColour(1, 1, 1) end
-function Breadcrumbs.SetLineMagenta() Breadcrumbs.SetLineColour(1, 0, 1) end
-function Breadcrumbs.SetLineBlue()    Breadcrumbs.SetLineColour(0, 0, 1) end
-function Breadcrumbs.SetLineGreen()   Breadcrumbs.SetLineColour(0, 1, 0) end
-function Breadcrumbs.SetLineRed()     Breadcrumbs.SetLineColour(1, 0, 0) end
 
 function Breadcrumbs.ToggleUIVisibility()
     if (Breadcrumbs.showUI) then

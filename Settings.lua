@@ -66,6 +66,7 @@ local optionsTable = {
         default = Breadcrumbs.defaults.importString,
         isMultiline = true,
         isExtraWide = true,
+        maxChars = 30000,
         getFunc = function() return Breadcrumbs.sV.importString end,
         setFunc = function(value) Breadcrumbs.sV.importString = value end,
     },
@@ -85,17 +86,27 @@ local optionsTable = {
         default = Breadcrumbs.defaults.exportString,
         isMultiline = true,
         isExtraWide = true,
+        maxChars = 30000,
         getFunc = function() return Breadcrumbs.sV.exportString end,
         setFunc = function(value) end,
     },
     {
         type = "header",
-        name = "Draw Shapes",
+        name = "Draw lines",
+    },
+    {
+        type = "button",
+        name = "Show Draw Menu",
+        func = function(value) Breadcrumbs.ToggleUIVisibility() end,
     },
     {
         type = "submenu",
-        name = "Regular Polyhedra",
+        name = "Regular Polygon",
         controls = {
+            {
+                type = "description",
+                text = "Select the appropriate parameters and then click draw to create a regular polygon around yourself. For shapes with an odd number of vertices, the first vertex is placed directly in front of you. For those with an even number, the first edge is placed in front of you instead.",
+            },
             {
                 type = "slider",
                 name = "Number of sides",
@@ -119,9 +130,9 @@ local optionsTable = {
             {
                 type = "colorpicker",
                 name = "Colour",
-                default = Breadcrumbs.defaults.colour,
+                default = ZO_ColorDef:New(unpack(Breadcrumbs.defaults.colour)),
                 getFunc = function() return unpack(Breadcrumbs.sV.colour) end,
-                setFunc = function(r,g,b,a) Breadcrumbs.sV.colour = {r,g,b} end,
+                setFunc = function(r,g,b,a) Breadcrumbs.SetLineColour(r, g, b) end,
             },
             {
                 type = "button",
@@ -134,6 +145,6 @@ local optionsTable = {
 }
 
 function Breadcrumbs.RegisterSettingsPanel()
-    LAM:RegisterAddonPanel(Breadcrumbs.name.."Options", panelData)
+    Breadcrumbs.addon_panel = LAM:RegisterAddonPanel(Breadcrumbs.name.."Options", panelData)
     LAM:RegisterOptionControls(Breadcrumbs.name.."Options", optionsTable)
 end

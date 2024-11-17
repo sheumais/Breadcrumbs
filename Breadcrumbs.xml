@@ -2,7 +2,7 @@
     <Controls>
         <TopLevelControl name="Breadcrumbs_Menu_Window" clampedToScreen="true" mouseEnabled="true" movable="true" hidden="true" >
             <Anchor point="BOTTOM" relativeTo="GuiRoot" relativePoint="CENTER" offsetY="-150" />
-            <Dimensions x="400" y="250" />
+            <Dimensions x="425" y="250" />
             <Controls>
                 <Backdrop name="$(parent)_BG">
                     <Center file="esoui/art/tooltips/ui-tooltipcenter.dds" />
@@ -16,14 +16,30 @@
                         <Label name="$(parent)_Subtitle" font="ZoFontHeader" text="Breadcrumbs Line Menu" >
                             <Anchor point="CENTER" relativePoint="CENTER" />
                         </Label>
-                        <Button name="$(parent)_Close" inherits="ZO_CloseButton" >
-                            <Anchor point="RIGHT" relativePoint="RIGHT" offsetX="-4" offsetY="-4" />
+                        <Button name="$(parent)_Close" inherits="ZO_ButtonBehaviorClickSound">
+							<Dimensions x="24" y="24" />
+							<Anchor point="RIGHT" relativeTo="$(parent)" relativePoint="RIGHT" offsetX="-5" offsetY="-5" />
+							<Textures normal="/esoui/art/buttons/decline_up.dds"
+								pressed="/esoui/art/buttons/decline_down.dds"
+								mouseOver="/esoui/art/buttons/decline_over.dds"
+								disabled="/esoui/art/buttons/decline_disabled.dds" />
                             <OnClicked>
                                 Breadcrumbs.HideUI()
                             </OnClicked>
                         </Button>
                     </Controls>
                 </Control>
+                <Button name="$(parent)_Settings_Button" inherits="ZO_ButtonBehaviorClickSound">
+                    <Dimensions x="24" y="24"/>
+                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$(parent)" offsetX="5" offsetY="5"/>
+                    <Textures normal="/esoui/art/buttons/info_up.dds"
+                    pressed="/esoui/art/buttons/info_down.dds"
+                    mouseOver="/esoui/art/buttons/info_over.dds"
+                    disabled="/esoui/art/buttons/info_disabled.dds" />
+                    <OnClicked>
+                        LibAddonMenu2:OpenToPanel(Breadcrumbs.addon_panel)
+                    </OnClicked>
+                </Button>
                 
                 <Texture name="$(parent)_Coloured_Square" color="FFFFFF">
                     <Anchor point="CENTER" relativePoint="CENTER" />
@@ -40,7 +56,7 @@
                             </OnClicked>
                         </Button>
                         <Button name="$(parent)_Remove_Button" text="Remove" inherits="ZO_DefaultButton" >
-                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)_Place_Button" offsetX="10" />
+                            <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="Breadcrumbs_Menu_Window" offsetY="-10"/>
                             <OnClicked>
                                 Breadcrumbs.RemoveClosestLine()
                             </OnClicked>
@@ -62,39 +78,25 @@
                     </Controls>
                 </Control>
                 
-                <Control name="$(parent)_ColorButtons">
-                    <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$(parent)" offsetX="-60" offsetY="-12" />
+                <Control name="$(parent)_Colour">
+                    <Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$(parent)" offsetY="-26"/>
                     <Controls>
-                        <Button name="$(parent)_Red_Button" text="Red" inherits="ZO_DefaultButton">
-                            <Anchor point="BOTTOM" relativePoint="BOTTOM" />
-                            <OnClicked>
-                                Breadcrumbs.SetLineRed()
-                            </OnClicked>
-                        </Button>
-                        <Button name="$(parent)_Green_Button" text="Green" inherits="ZO_DefaultButton">
-                            <Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(parent)_Red_Button" offsetY="-6" />
-                            <OnClicked>
-                                Breadcrumbs.SetLineGreen()
-                            </OnClicked>
-                        </Button>
-                        <Button name="$(parent)_Magenta_Button" text="Magenta" inherits="ZO_DefaultButton">
-                            <Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(parent)_Green_Button" offsetY="-6" />
-                            <OnClicked>
-                                Breadcrumbs.SetLineMagenta()
-                            </OnClicked>
-                        </Button>
-                        <Button name="$(parent)_White_Button" text="White" inherits="ZO_DefaultButton">
-                            <Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(parent)_Magenta_Button" offsetY="-6" />
-                            <OnClicked>
-                                Breadcrumbs.SetLineWhite()
-                            </OnClicked>
-                        </Button>
                         <Button name="$(parent)_Custom_Button" text="Custom" inherits="ZO_DefaultButton">
-                            <Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(parent)_White_Button" offsetY="-6" />
+                            <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$(parent)"/>
                             <OnClicked>
                                 Breadcrumbs.ShowColourPicker()
                             </OnClicked>
                         </Button>
+                        <Control name="$(parent)_Selection" inherits="ZO_ComboBox" mouseEnabled="true">
+                        <Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$(parent)_Custom_Button" offsetX="12"/>
+                        <Dimensions x="32" y="48"/>
+                            <Controls>
+                                <Backdrop name="$(parent)BG" override="true" hidden="true" />
+                                <Button name="$(parent)_OpenDropdown" override="true">
+                                    <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT"/>
+                                </Button>
+                            </Controls>
+                        </Control>
                     </Controls>
                 </Control>
 

@@ -150,14 +150,18 @@ function Breadcrumbs.DrawPolygon(r, n, colour)
     if n < 3 then return end
     Breadcrumbs.InitialiseZone()
     local zoneId, playerX, playerY, playerZ = GetUnitRawWorldPosition("player")
-    local radius = r * 100 -- Convert from metres to in-game units
+    local radius = r * 100
+    local _, _, heading = GetMapPlayerPosition("player")
 
     local points = {}
     for i = 1, n do
-        local angle = (2 * math.pi / n) * i
-        local x = playerX + radius * math.cos(angle)
+        local angle = heading + math.pi + (2 * math.pi / n) * (i - 1)
+        if n % 2 == 0 then
+            angle = angle + math.pi / 4
+        end
+        local x = playerX + radius * math.sin(angle)
         local y = playerY
-        local z = playerZ + radius * math.sin(angle)
+        local z = playerZ + radius * math.cos(angle)
 
         table.insert(points, {x = x, y = y, z = z})
     end
@@ -165,7 +169,11 @@ function Breadcrumbs.DrawPolygon(r, n, colour)
     for i = 1, n do
         local sP = points[i]
         local eP = points[i % n + 1]
-        local line = Breadcrumbs.CreateLinePrimitive(sP.x, sP.y, sP.z, eP.x, eP.y, eP.z, colour or Breadcrumbs.sV.colour or {1, 1, 1})
+        local line = Breadcrumbs.CreateLinePrimitive(
+            sP.x, sP.y, sP.z,
+            eP.x, eP.y, eP.z,
+            colour or Breadcrumbs.sV.colour or {1, 1, 1}
+        )
         if line then
             table.insert(Breadcrumbs.sV.savedLines[zoneId], line)
         end
@@ -173,6 +181,38 @@ function Breadcrumbs.DrawPolygon(r, n, colour)
 
     Breadcrumbs.RefreshLines()
     return zoneId
+end
+
+local function hueToRGB(h)
+    local x = 1 - math.abs((h / 60) % 2 - 1)
+    local r, g, b
+
+    if h >= 0 and h < 60 then
+        r, g, b = 1, x, 0
+    elseif h >= 60 and h < 120 then
+        r, g, b = x, 1, 0
+    elseif h >= 120 and h < 180 then
+        r, g, b = 0, 1, x
+    elseif h >= 180 and h < 240 then
+        r, g, b = 0, x, 1
+    elseif h >= 240 and h < 300 then
+        r, g, b = x, 0, 1
+    else
+        r, g, b = 1, 0, x
+    end
+
+    return {r, g, b}
+end
+
+function Breadcrumbs.DrawRainbow() -- /script Breadcrumbs.DrawRainbow()
+    local zoneId, playerX, playerY, playerZ = GetUnitRawWorldPosition("player")
+    for i = 0, 255 do
+        local colour = hueToRGB(i)
+        d(colour)
+        local line = Breadcrumbs.CreateLinePrimitive(playerX+i*20, playerY, playerZ, playerX+i*20, playerY, playerZ+1000, colour)
+        table.insert(Breadcrumbs.sV.savedLines[zoneId], line)
+    end
+    Breadcrumbs.RefreshLines()
 end
 
 function Breadcrumbs.PopulateZoneLinesFromTable(zoneId, lines)

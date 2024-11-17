@@ -80,7 +80,7 @@ function Breadcrumbs.EncodeZoneLinesToString(zoneId) -- /script d(Breadcrumbs.En
                 return i
             end
         end
-        return 1 -- shouldn't ever happen, but just in case it does
+        return 1 -- shouldn't ever happen
     end
 
     local string = string.format("%X;%X;%X;%X;", zoneId, min_x, min_y, min_z)
