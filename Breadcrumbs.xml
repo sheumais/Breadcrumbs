@@ -30,12 +30,11 @@
                     </Controls>
                 </Control>
                 <Button name="$(parent)_Settings_Button" inherits="ZO_ButtonBehaviorClickSound">
-                    <Dimensions x="24" y="24"/>
-                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$(parent)" offsetX="5" offsetY="5"/>
-                    <Textures normal="/esoui/art/buttons/info_up.dds"
-                    pressed="/esoui/art/buttons/info_down.dds"
-                    mouseOver="/esoui/art/buttons/info_over.dds"
-                    disabled="/esoui/art/buttons/info_disabled.dds" />
+                    <Dimensions x="32" y="32"/>
+                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$(parent)" offsetX="4" offsetY="4"/>
+                    <Textures normal="/esoui/art/companion/keyboard/companion_overview_up.dds"
+                    mouseOver="/esoui/art/companion/keyboard/companion_overview_over.dds"
+                    disabled="/esoui/art/companion/keyboard/companion_overview_disabled.dds" />
                     <OnClicked>
                         LibAddonMenu2:OpenToPanel(Breadcrumbs.addon_panel)
                     </OnClicked>

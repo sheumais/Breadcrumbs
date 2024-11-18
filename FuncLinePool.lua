@@ -27,6 +27,7 @@ function Breadcrumbs.CreateLineControl( name )
     }
 end
 
+-- todo, replace this with ZO_ControlPool
 function Breadcrumbs.AddLineToPool( x1, y1, z1, x2, y2, z2, colour --[[ Nilable --]] )
     local line
     local linePool = Breadcrumbs.GetLinePool()
@@ -183,37 +184,64 @@ function Breadcrumbs.DrawPolygon(r, n, colour)
     return zoneId
 end
 
-local function hueToRGB(h)
-    local x = 1 - math.abs((h / 60) % 2 - 1)
-    local r, g, b
-
-    if h >= 0 and h < 60 then
-        r, g, b = 1, x, 0
-    elseif h >= 60 and h < 120 then
-        r, g, b = x, 1, 0
-    elseif h >= 120 and h < 180 then
-        r, g, b = 0, 1, x
-    elseif h >= 180 and h < 240 then
-        r, g, b = 0, x, 1
-    elseif h >= 240 and h < 300 then
-        r, g, b = x, 0, 1
-    else
-        r, g, b = 1, 0, x
-    end
-
-    return {r, g, b}
-end
-
-function Breadcrumbs.DrawRainbow() -- /script Breadcrumbs.DrawRainbow()
+function Breadcrumbs.DrawPentagram(r, num)
+    if r <= 0.99 then return end
+    Breadcrumbs.InitialiseZone()
     local zoneId, playerX, playerY, playerZ = GetUnitRawWorldPosition("player")
-    for i = 0, 255 do
-        local colour = hueToRGB(i)
-        d(colour)
-        local line = Breadcrumbs.CreateLinePrimitive(playerX+i*20, playerY, playerZ, playerX+i*20, playerY, playerZ+1000, colour)
-        table.insert(Breadcrumbs.sV.savedLines[zoneId], line)
+    local radius = r * 100
+    local _, _, heading = GetMapPlayerPosition("player")
+    local n = num or 32
+
+    local circlePoints = {}
+    local pentagramPoints = {}
+
+    for i = 1, n do
+        local angle = heading + math.pi + (2 * math.pi / n) * (i - 1)
+        local x = playerX + radius * math.sin(angle)
+        local y = playerY
+        local z = playerZ + radius * math.cos(angle)
+        table.insert(circlePoints, {x = x, y = y, z = z})
     end
+
+    for i = 1, 5 do
+        local angle = heading + math.pi + (2 * math.pi / 5) * (i - 1)
+        local x = playerX + radius * math.sin(angle)
+        local y = playerY
+        local z = playerZ + radius * math.cos(angle)
+        table.insert(pentagramPoints, {x = x, y = y, z = z})
+    end
+
+    for i = 1, n do
+        local sP = circlePoints[i]
+        local eP = circlePoints[i % n + 1]
+        local line = Breadcrumbs.CreateLinePrimitive(
+            sP.x, sP.y, sP.z,
+            eP.x, eP.y, eP.z,
+            Breadcrumbs.sV.colour or {1, 0, 0}
+        )
+        if line then
+            table.insert(Breadcrumbs.sV.savedLines[zoneId], line)
+        end
+    end
+
+    local starIndices = {1, 3, 5, 2, 4, 1}
+    for i = 1, #starIndices - 1 do
+        local sP = pentagramPoints[starIndices[i]]
+        local eP = pentagramPoints[starIndices[i + 1]]
+        local line = Breadcrumbs.CreateLinePrimitive(
+            sP.x, sP.y, sP.z,
+            eP.x, eP.y, eP.z,
+            Breadcrumbs.sV.colour or {1, 0, 0}
+        )
+        if line then
+            table.insert(Breadcrumbs.sV.savedLines[zoneId], line)
+        end
+    end
+
     Breadcrumbs.RefreshLines()
+    return zoneId
 end
+
 
 function Breadcrumbs.PopulateZoneLinesFromTable(zoneId, lines)
     for _, line in pairs(lines) do
