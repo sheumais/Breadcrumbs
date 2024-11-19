@@ -44,13 +44,23 @@ function Breadcrumbs.CreateTopLevelControl()
 	Breadcrumbs.depthwin:SetDrawLevel( 0 )
     Breadcrumbs.depthwin:Create3DRenderSpace()
 
+    Breadcrumbs.measurementControl = CreateControl("BreadcrumbsMeasurementControl", GuiRoot, CT_CONTROL)
+    Breadcrumbs.measurementControl:Create3DRenderSpace()
+
 	local frag = ZO_HUDFadeSceneFragment:New( Breadcrumbs.win )
 	HUD_UI_SCENE:AddFragment( frag )
     HUD_SCENE:AddFragment( frag )
     LOOT_SCENE:AddFragment( frag )
 end
 
-function Breadcrumbs.Create3D() -- /script Breadcrumbs.Create3D()
+function Breadcrumbs.GetCamera3DPosition()
+	Set3DRenderSpaceToCurrentCamera(Breadcrumbs.measurementControl:GetName())
+	local worldX, worldZ, worldY = Breadcrumbs.measurementControl:Get3DRenderSpaceOrigin()
+	worldX, worldZ, worldY = GuiRender3DPositionToWorldPosition(worldX, worldZ, worldY)
+	return worldX/100, worldY/100, worldZ/100
+end
+
+function Breadcrumbs.Create3D(x1, y1, z1, x2, y2, z2) -- /script Breadcrumbs.Create3D(220000, 12500, 225000, 223000, 13000, 224500)
     if not Breadcrumbs.depthtexture then
         Breadcrumbs.depthtexture = Breadcrumbs.window:CreateControl("Breadcrumbs3DTest", Breadcrumbs.depthwin, CT_TEXTURE)
         Breadcrumbs.depthtexture:SetTexture("esoui/art/icons/icon_missing.dds")
@@ -59,23 +69,31 @@ function Breadcrumbs.Create3D() -- /script Breadcrumbs.Create3D()
     if not Breadcrumbs.depthtexture:Has3DRenderSpace() then
         Breadcrumbs.depthtexture:Create3DRenderSpace()
     end
-    local width = 10
-    local height = 10
+    local dx = (x2-x1)/2
+    local dy = (y2-y1)/2
+    local dz = (z2-z1)/2
+    local mx = x1+dx
+    local my = y1+dy
+    local mz = z1+dz
+    local length = math.sqrt(dx*dx + dy*dy + dz*dz)
+    local width = length / 50
+    local height = 0.5
     Breadcrumbs.depthtexture:Set3DLocalDimensions(width, height)
     Breadcrumbs.depthtexture:SetDrawLevel(3)
     Breadcrumbs.depthtexture:SetColor(1, 1, 1, 1)
     Breadcrumbs.depthtexture:Set3DRenderSpaceUsesDepthBuffer(true)
     Breadcrumbs.depthtexture:Set3DRenderSpaceOrigin(0,0,0)
-    local _, x, y, z = GetUnitWorldPosition("player")
-    d("World Position: " .. x .. " " .. y .. " " .. z)
-    local worldX, worldY, worldZ = WorldPositionToGuiRender3DPosition(x, y, z)
-    d("Gui Render Pos: " .. worldX .. " " .. worldY .. " " .. worldZ)
-    Breadcrumbs.depthtexture:Set3DRenderSpaceOrigin(worldX, worldY+height/2, worldZ)
+    local worldX, worldY, worldZ = WorldPositionToGuiRender3DPosition(mx, my, mz)
+    Breadcrumbs.depthtexture:Set3DRenderSpaceOrigin(worldX, worldY, worldZ)
     local heading = GetPlayerCameraHeading()
     if heading > math.pi then --normalize heading to [-pi,pi]
         heading = heading - 2 * math.pi
     end
-    Breadcrumbs.depthtexture:Set3DRenderSpaceOrientation(0,heading,0)
+    local roll = calculateRoll(dx, dy, dz)
+    -- d(roll)
+    local yaw = calculateYaw(dx, dy, dz)
+    d(yaw)
+    Breadcrumbs.depthtexture:Set3DRenderSpaceOrientation(0,-yaw,roll)
 end
 
 function Breadcrumbs.LoadSavedZoneLines(event)

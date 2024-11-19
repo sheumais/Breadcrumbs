@@ -19,11 +19,15 @@ end
 
 function Breadcrumbs.CreateLineControl( name )
     local line = {}
-    line.lineControl = WINDOW_MANAGER:CreateControl(name, Breadcrumbs.win, CT_CONTROL)
-    line.backdrop = WINDOW_MANAGER:CreateControl("$(parent)Backdrop", line.lineControl, CT_BACKDROP)
+    line.lineControl = Breadcrumbs.window:CreateControl(name, Breadcrumbs.depthwin, CT_TEXTURE)
+    -- line.lineControl = WINDOW_MANAGER:CreateControl(name, Breadcrumbs.win, CT_CONTROL)
+    -- line.backdrop = WINDOW_MANAGER:CreateControl("$(parent)Backdrop", line.lineControl, CT_BACKDROP)
+    -- return {
+    --     ["lineControl"] = line.lineControl,
+    --     ["backdrop"] = line.backdrop,
+    -- }
     return {
         ["lineControl"] = line.lineControl,
-        ["backdrop"] = line.backdrop,
     }
 end
 

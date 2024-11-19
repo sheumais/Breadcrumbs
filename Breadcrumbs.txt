@@ -18,3 +18,5 @@ FuncLinePool.lua
 Breadcrumbs.xml
 Settings.lua
 Encoding.lua
+texture/gradient.dds
+texture/uniform.dds

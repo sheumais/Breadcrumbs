@@ -95,21 +95,66 @@ function Breadcrumbs.DrawAllLines()
     local linePool = Breadcrumbs.GetLinePool()
     -- local _, x, y, z = GetUnitRawWorldPosition("player")
     for _, line in pairs( linePool ) do
-        local x1, y1, visible1, scale1 = GetViewCoordinates(line.x1, line.y1, line.z1)
-        local x2, y2, visible2, scale2 = GetViewCoordinates(line.x2, line.y2, line.z2)
-        local scale = math.max(scale1, scale2)
-        -- local maxYDistance = 1 + math.min(math.abs(y - line.y1), math.abs(y - line.y2)) / 500
-        -- scale = math.min(scale * (1 / maxYDistance), 1)
-        if line.use ~= true then visible1 = false visible2 = false end
-        if scale < ( 1. / Breadcrumbs.sV.width ) then visible1 = false visible2 = false end -- fade out far away lines
+        -- local x1, y1, visible1, scale1 = GetViewCoordinates(line.x1, line.y1, line.z1)
+        -- local x2, y2, visible2, scale2 = GetViewCoordinates(line.x2, line.y2, line.z2)
+        -- local scale = math.max(scale1, scale2)
+        -- -- local maxYDistance = 1 + math.min(math.abs(y - line.y1), math.abs(y - line.y2)) / 500
+        -- -- scale = math.min(scale * (1 / maxYDistance), 1)
+        -- if line.use ~= true then visible1 = false visible2 = false end
+        -- if scale < ( 1. / Breadcrumbs.sV.width ) then visible1 = false visible2 = false end -- fade out far away lines
 
-        if (not visible1 and not visible2) then
-            line.lineControl:SetHidden(true)
-        else
-            line.lineControl:SetHidden(false)
-            Breadcrumbs.DrawLine(x1, y1, x2, y2, line, scale)
+        -- if (not visible1 and not visible2) then
+        --     line.lineControl:SetHidden(true)
+        -- else
+        --     line.lineControl:SetHidden(false)
+        --     Breadcrumbs.DrawLine(x1, y1, x2, y2, line, scale)
+        -- end
+        if line.use then line.lineControl:SetHidden(false) else line.lineControl:SetHidden(true) end
+        line.lineControl:SetTexture("esoui/art/icons/icon_missing.dds")
+        if not line.lineControl:Has3DRenderSpace() then
+            line.lineControl:Create3DRenderSpace()
         end
+        local dx = (line.x2-line.x1)/2
+        local dy = (line.y2-line.y1)/2
+        local dz = (line.z2-line.z1)/2
+        local mx = line.x1+dx
+        local my = line.y1+dy
+        local mz = line.z1+dz
+        local length = math.sqrt(dx*dx + dy*dy + dz*dz)
+        local width = length / 50
+        local height = 0.5
+        line.lineControl:Set3DLocalDimensions(width, height)
+        line.lineControl:SetDrawLevel(3)
+        line.lineControl:SetColor(1, 1, 1, 1)
+        line.lineControl:Set3DRenderSpaceUsesDepthBuffer(true)
+        line.lineControl:Set3DRenderSpaceOrigin(0,0,0)
+        local worldX, worldY, worldZ = WorldPositionToGuiRender3DPosition(mx, my+45, mz)
+        line.lineControl:Set3DRenderSpaceOrigin(worldX, worldY, worldZ)
+        d(worldX .. " | " .. worldY .. " | " .. worldZ)
+        -- local heading = GetPlayerCameraHeading()
+        -- if heading > math.pi then --normalize heading to [-pi,pi]
+        --     heading = heading - 2 * math.pi
+        -- end
+        local roll = Breadcrumbs.calculateRoll(dx, dy, dz)
+        local yaw = Breadcrumbs.calculateYaw(dx, dy, dz)
+        --d(yaw .. " | dx: " .. dx .. " dz: " .. dz)
+        --d(roll .. " | dx: " .. dx .. " dy: " .. dy)
+        line.lineControl:Set3DRenderSpaceOrientation(0,-yaw,roll)
     end
+    d(GetUnitRawWorldPosition("player"))
+end
+
+function Breadcrumbs.calculateRoll(x, y, z)
+    local roll = math.atan2(y, x)
+    if (x < 0) then 
+        roll = roll - math.pi
+    end
+    return roll
+end
+
+function Breadcrumbs.calculateYaw(x, y, z)
+    local yaw = math.atan2(z, x)
+    return yaw
 end
 
 function Breadcrumbs.HideAllLines()
