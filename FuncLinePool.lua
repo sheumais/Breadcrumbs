@@ -56,11 +56,11 @@ function Breadcrumbs.DiscardLine(line)
 end
 
 function Breadcrumbs.GetLinePool()
-    return Breadcrumbs.sV.linePool or {}
+    return Breadcrumbs.linePool or {}
 end
 
 function Breadcrumbs.ClearLinePool()
-    Breadcrumbs.sV.linePool = {}
+    Breadcrumbs.linePool = {}
 end
 
 -- Lines don't simply vanish from the screen when we remove savedVariables data

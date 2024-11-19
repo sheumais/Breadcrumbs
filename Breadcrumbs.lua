@@ -7,7 +7,6 @@ Breadcrumbs.savedVariablesVersion = 1 -- don't change
 Breadcrumbs.showUI = false
 Breadcrumbs.ui = {}
 Breadcrumbs.defaults = {
-    linePool = {},
     savedLines = {},
     loc1 = nil,
     loc2 = nil,
