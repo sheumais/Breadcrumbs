@@ -38,44 +38,10 @@ function Breadcrumbs.CreateTopLevelControl()
 	Breadcrumbs.win:SetDrawTier( DT_LOW )
 	Breadcrumbs.win:SetDrawLevel( 0 )
 
-    Breadcrumbs.depthwin = Breadcrumbs.window:CreateTopLevelWindow("Breadcrumbs3DWindow")
-    Breadcrumbs.depthwin:SetDrawLayer( DL_BACKGROUND )
-	Breadcrumbs.depthwin:SetDrawTier( DT_LOW )
-	Breadcrumbs.depthwin:SetDrawLevel( 0 )
-    Breadcrumbs.depthwin:Create3DRenderSpace()
-
 	local frag = ZO_HUDFadeSceneFragment:New( Breadcrumbs.win )
 	HUD_UI_SCENE:AddFragment( frag )
     HUD_SCENE:AddFragment( frag )
     LOOT_SCENE:AddFragment( frag )
-end
-
-function Breadcrumbs.Create3D() -- /script Breadcrumbs.Create3D()
-    if not Breadcrumbs.depthtexture then
-        Breadcrumbs.depthtexture = Breadcrumbs.window:CreateControl("Breadcrumbs3DTest", Breadcrumbs.depthwin, CT_TEXTURE)
-        Breadcrumbs.depthtexture:SetTexture("esoui/art/icons/icon_missing.dds")
-        --Breadcrumbs.depthtexture:SetTexture("Breadcrumbs/texture/gradient.dds")
-    end 
-    if not Breadcrumbs.depthtexture:Has3DRenderSpace() then
-        Breadcrumbs.depthtexture:Create3DRenderSpace()
-    end
-    local width = 10
-    local height = 10
-    Breadcrumbs.depthtexture:Set3DLocalDimensions(width, height)
-    Breadcrumbs.depthtexture:SetDrawLevel(3)
-    Breadcrumbs.depthtexture:SetColor(1, 1, 1, 1)
-    Breadcrumbs.depthtexture:Set3DRenderSpaceUsesDepthBuffer(true)
-    Breadcrumbs.depthtexture:Set3DRenderSpaceOrigin(0,0,0)
-    local _, x, y, z = GetUnitWorldPosition("player")
-    d("World Position: " .. x .. " " .. y .. " " .. z)
-    local worldX, worldY, worldZ = WorldPositionToGuiRender3DPosition(x, y, z)
-    d("Gui Render Pos: " .. worldX .. " " .. worldY .. " " .. worldZ)
-    Breadcrumbs.depthtexture:Set3DRenderSpaceOrigin(worldX, worldY+height/2, worldZ)
-    local heading = GetPlayerCameraHeading()
-    if heading > math.pi then --normalize heading to [-pi,pi]
-        heading = heading - 2 * math.pi
-    end
-    Breadcrumbs.depthtexture:Set3DRenderSpaceOrientation(0,heading,0)
 end
 
 function Breadcrumbs.LoadSavedZoneLines(event)
