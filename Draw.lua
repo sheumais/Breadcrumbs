@@ -1,5 +1,4 @@
 Breadcrumbs = Breadcrumbs or {}
-Breadcrumbs.interval = 10
 
 function Breadcrumbs.StopPolling()
     EVENT_MANAGER:UnregisterForUpdate( Breadcrumbs.name .. "Update" )
@@ -7,7 +6,7 @@ end
 
 function Breadcrumbs.StartPolling()
     EVENT_MANAGER:UnregisterForUpdate( Breadcrumbs.name .. "Update" )
-    EVENT_MANAGER:RegisterForUpdate( Breadcrumbs.name .. "Update", Breadcrumbs.interval, Breadcrumbs.DrawAllLines )
+    EVENT_MANAGER:RegisterForUpdate( Breadcrumbs.name .. "Update", Breadcrumbs.sV.polling, Breadcrumbs.DrawAllLines )
 end
 
 ---------------------------------------------------------------------

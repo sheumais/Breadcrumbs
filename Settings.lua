@@ -6,7 +6,6 @@ local panelData = {
     type = "panel",
     name = Breadcrumbs.name, -- sidebar name
     displayName = Breadcrumbs.title,
-    author = Breadcrumbs.author,
     version = Breadcrumbs.version,
     registerForRefresh = true,
     registerForDefaults = true,
@@ -27,26 +26,6 @@ local optionsTable = {
             Breadcrumbs.sV.enabled = value
             Breadcrumbs.RefreshLines()
         end,
-    },
-    {
-        type = "slider",
-        name = "Line width",
-        min = 3,
-        max = 24,
-        default = Breadcrumbs.defaults.width,
-        getFunc = function() return Breadcrumbs.sV.width end,
-        setFunc = function(value) Breadcrumbs.sV.width = value end,
-    },
-    {
-        type = "slider",
-        name = "Line opacity",
-        min = 0.1,
-        max = 1,
-        step = 0.05,
-        decimals = 2,
-        default = Breadcrumbs.defaults.alpha,
-        getFunc = function() return Breadcrumbs.sV.alpha end,
-        setFunc = function(value) Breadcrumbs.sV.alpha = value end,
     },
     {
         type = "button",
@@ -86,9 +65,45 @@ local optionsTable = {
         default = Breadcrumbs.defaults.exportString,
         isMultiline = true,
         isExtraWide = true,
-        maxChars = 30000,
+        maxChars = 10000,
         getFunc = function() return Breadcrumbs.sV.exportString end,
         setFunc = function(value) end,
+    },
+    {
+        type = "submenu",
+        name = "General Settings",
+        controls = {
+            {
+                type = "slider",
+                name = "Line width",
+                min = 3,
+                max = 24,
+                default = Breadcrumbs.defaults.width,
+                getFunc = function() return Breadcrumbs.sV.width end,
+                setFunc = function(value) Breadcrumbs.sV.width = value end,
+            },
+            {
+                type = "slider",
+                name = "Line opacity",
+                min = 0.1,
+                max = 1,
+                step = 0.05,
+                decimals = 2,
+                default = Breadcrumbs.interval,
+                getFunc = function() return Breadcrumbs.sV.alpha end,
+                setFunc = function(value) Breadcrumbs.sV.alpha = value end,
+            },
+            {
+                type = "slider",
+                name = "Polling frquency (ms)",
+                min = 1,
+                max = 24,
+                step = 1,
+                default = Breadcrumbs.defaults.polling,
+                getFunc = function() return Breadcrumbs.sV.polling end,
+                setFunc = function(value) Breadcrumbs.sV.polling = value Breadcrumbs.StopPolling() Breadcrumbs.StartPolling() end,
+            },
+        },
     },
     {
         type = "header",
@@ -98,6 +113,16 @@ local optionsTable = {
         type = "button",
         name = "Show Draw Menu",
         func = function(value) Breadcrumbs.ToggleUIVisibility() end,
+    },
+    {
+        type = "submenu",
+        name = "Drawing Readme/Guide",
+        controls = {
+            {
+                type = "description",
+                text = "To draw lines using the draw menu simply save your current location into either location 1 (loc1) or location 2 (loc2) at two different positions, then click draw. This will create a line between these two positions. You can select the colour of the line from a palette using the dropdown, or specify your own colour using the colour picker accessed through the custom button. To remove a line, simply press remove. This will remove the line with the closest endpoint to your current location, not the line segment closest to you. I may change this in future if that is wanted. Finally, you can use the functions below to draw special shapes, such as polygons.",
+            },
+        },
     },
     {
         type = "submenu",
