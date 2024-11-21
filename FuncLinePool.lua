@@ -93,6 +93,10 @@ function Breadcrumbs.InitialiseZone()
     Breadcrumbs.sV.savedLines[zoneId] = Breadcrumbs.GetSavedZoneLines(zoneId)
 end
 
+function Breadcrumbs.InitialiseExternalZone(zoneId)
+    Breadcrumbs.sV.savedLines[zoneId] = Breadcrumbs.GetSavedZoneLines(zoneId)
+end
+
 function Breadcrumbs.CreateSavedZoneLine(x1, y1, z1, x2, y2, z2, colour --[[ Nilable --]] )
     Breadcrumbs.InitialiseZone()
     local zoneId = Breadcrumbs.GetZoneId()
@@ -244,6 +248,7 @@ end
 
 
 function Breadcrumbs.PopulateZoneLinesFromTable(zoneId, lines)
+    Breadcrumbs.InitialiseExternalZone(zoneId)
     for _, line in pairs(lines) do
         table.insert(Breadcrumbs.sV.savedLines[zoneId], line)
     end
