@@ -1,6 +1,7 @@
 Breadcrumbs = Breadcrumbs or {}
 Breadcrumbs.name = "Breadcrumbs"
 Breadcrumbs.version = "1.0"
+Breadcrumbs.author = "TheMrPancake"
 Breadcrumbs.title = "|cff7f40Breadcrumbs|r"
 
 Breadcrumbs.savedVariablesVersion = 1 -- don't change

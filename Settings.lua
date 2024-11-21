@@ -5,6 +5,7 @@ local LAM = LibAddonMenu2
 local panelData = {
     type = "panel",
     name = Breadcrumbs.name, -- sidebar name
+    author = Breadcrumbs.author,
     displayName = Breadcrumbs.title,
     version = Breadcrumbs.version,
     registerForRefresh = true,

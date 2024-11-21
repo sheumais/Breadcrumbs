@@ -1,5 +1,6 @@
 ## Title: |cff7f40Breadcrumbs|r
 ## Description: Draw lines with /breadcrumbs
+## Author: TheMrPancake
 ## DependsOn: LibAddonMenu-2.0>=37
 ## APIVersion: 101044
 ## AddOnVersion: 1
