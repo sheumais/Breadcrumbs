@@ -129,6 +129,7 @@ local function OnAddOnLoaded(_, name)
     Breadcrumbs.InitialiseUI()
     Breadcrumbs.RegisterSettingsPanel()
     Breadcrumbs.ClearLinePool()
+    Breadcrumbs.FuncLinePoolLocalise()
     Breadcrumbs.RefreshLines()
     Breadcrumbs.StartPolling()
 

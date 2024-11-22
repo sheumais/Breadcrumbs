@@ -1,12 +1,28 @@
 Breadcrumbs = Breadcrumbs or {}
 
+local DrawLine, GetLinePool, DrawAllLines, sqrt, atan, max, abs, uiW, uiH
+
 function Breadcrumbs.StopPolling()
     EVENT_MANAGER:UnregisterForUpdate( Breadcrumbs.name .. "Update" )
 end
 
 function Breadcrumbs.StartPolling()
+    DrawLine = Breadcrumbs.DrawLine
+    GetLinePool = Breadcrumbs.GetLinePool
+    DrawAllLines = Breadcrumbs.DrawAllLines
+    uiW, uiH = GuiRoot:GetDimensions()
+    sqrt = math.sqrt
+    atan = math.atan
+    max = math.max
+    abs = math.abs
+    local linePool = GetLinePool()
+    -- local _, x, y, z = GetUnitRawWorldPosition("player")
+    for _, line in pairs( linePool ) do
+        Breadcrumbs.InitialiseLine(line)
+    end
+
     EVENT_MANAGER:UnregisterForUpdate( Breadcrumbs.name .. "Update" )
-    EVENT_MANAGER:RegisterForUpdate( Breadcrumbs.name .. "Update", Breadcrumbs.sV.polling, Breadcrumbs.DrawAllLines )
+    EVENT_MANAGER:RegisterForUpdate( Breadcrumbs.name .. "Update", Breadcrumbs.sV.polling, DrawAllLines )
 end
 
 ---------------------------------------------------------------------
@@ -54,9 +70,6 @@ local function GetViewCoordinates(wX, wY, wZ)
     local i42 = -( rX * fY * cZ + rY * fZ * cX + rZ * fX * cY - rZ * fY * cX - rY * fX * cZ - rX * fZ * cY )
     local i43 = -( rZ * uY * cX + rY * uX * cZ + rX * uZ * cY - rX * uY * cZ - rY * uZ * cX - rZ * uX * cY )
 
-    -- screen dimensions
-    local uiW, uiH = GuiRoot:GetDimensions()
-
     -- calculate unit view position
     local pX = wX * i11 + wY * i21 + wZ * i31 + i41
     local pY = wX * i12 + wY * i22 + wZ * i32 + i42
@@ -66,39 +79,40 @@ local function GetViewCoordinates(wX, wY, wZ)
     -- Kyz: this is the only thing I did, really. Taking the absolute value of pZ allows the conversion
     -- to still work; the line doesn't draw particularly well, but the idea of it being behind the
     -- camera object is still conveyed. I don't claim to know anything about this math though...
-    local w, h = GetWorldDimensionsOfViewFrustumAtDepth(math.abs(pZ))
+    local w, h = GetWorldDimensionsOfViewFrustumAtDepth(abs(pZ))
 
     local dX, dY, dZ = wX - cX, wY - cY, wZ - cZ
-    local dist = 1 + zo_sqrt( dX * dX + dY * dY + dZ * dZ )
+    local dist = 1 + sqrt( dX * dX + dY * dY + dZ * dZ )
     local scale = 2000 / dist or 1
 
     return pX * uiW / w, -pY * uiH / h, pZ > 0, scale
 end
 
-function Breadcrumbs.DrawLine(x1, y1, x2, y2, line, scale)
+function Breadcrumbs.InitialiseLine(line)
     line.backdrop:SetAnchorFill()
     local r, g, b = unpack(line.colour)
     line.backdrop:SetCenterColor(r, g, b, Breadcrumbs.sV.alpha)
     line.backdrop:SetEdgeColor(0,0,0,0)
-    line.lineControl:ClearAnchors()
+end
+
+function Breadcrumbs.DrawLine(x1, y1, x2, y2, line, scale)
     line.lineControl:SetAnchor(CENTER, GuiRoot, CENTER, (x1 + x2) / 2, (y1 + y2) / 2)
     local x = x2 - x1
     local y = y2 - y1
-    local length = math.sqrt(x*x + y*y)
+    local length = sqrt(x*x + y*y)
     line.lineControl:SetDimensions(length, Breadcrumbs.sV.width * scale)
-    local angle = math.atan(y/x)
+    local angle = atan(y/x)
     line.lineControl:SetTransformRotationZ(-angle)
 end
 
 function Breadcrumbs.DrawAllLines()
-    local linePool = Breadcrumbs.GetLinePool()
+    local linePool = GetLinePool()
     -- local _, x, y, z = GetUnitRawWorldPosition("player")
     for _, line in pairs( linePool ) do
         local x1, y1, visible1, scale1 = GetViewCoordinates(line.x1, line.y1, line.z1)
         local x2, y2, visible2, scale2 = GetViewCoordinates(line.x2, line.y2, line.z2)
-        local scale = math.max(scale1, scale2)
-        -- local maxYDistance = 1 + math.min(math.abs(y - line.y1), math.abs(y - line.y2)) / 500
-        -- scale = math.min(scale * (1 / maxYDistance), 1)
+        local scale = max(scale1, scale2)
+
         if line.use ~= true then visible1 = false visible2 = false end
         if scale < ( 1. / Breadcrumbs.sV.width ) then visible1 = false visible2 = false end -- fade out far away lines
 
@@ -106,13 +120,13 @@ function Breadcrumbs.DrawAllLines()
             line.lineControl:SetHidden(true)
         else
             line.lineControl:SetHidden(false)
-            Breadcrumbs.DrawLine(x1, y1, x2, y2, line, scale)
+            DrawLine(x1, y1, x2, y2, line, scale)
         end
     end
 end
 
 function Breadcrumbs.HideAllLines()
-    local linePool = Breadcrumbs.GetLinePool()
+    local linePool = GetLinePool()
     for _, line in pairs( linePool ) do
         line.lineControl:SetHidden(true) 
     end

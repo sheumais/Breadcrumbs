@@ -204,11 +204,14 @@ function Breadcrumbs.DecodeImportStringToZoneLines()
         local y2 = point2.y + min_y
         local z2 = point2.z + min_z
 
-        table.insert(lines, {
+        local line = {
             x1 = x1, y1 = y1, z1 = z1,
             x2 = x2, y2 = y2, z2 = z2,
             colour = colour
-        })
+        }
+        if line then 
+            table.insert(lines, line)
+        end
     end
     return zoneId, lines
 end
