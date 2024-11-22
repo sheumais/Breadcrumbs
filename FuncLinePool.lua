@@ -161,13 +161,13 @@ function Breadcrumbs.DrawPolygon(r, n, colour)
     local _, _, heading = GetMapPlayerPosition("player")
 
     local points = {}
+    local y = playerY
     for i = 1, n do
         local angle = heading + pi + (2 * pi / n) * (i - 1)
         if n % 2 == 0 then
             angle = angle + pi / 4
         end
         local x = playerX + radius * sin(angle)
-        local y = playerY
         local z = playerZ + radius * cos(angle)
 
         table.insert(points, {x = x, y = y, z = z})
@@ -201,10 +201,10 @@ function Breadcrumbs.DrawPentagram(r, num)
     local circlePoints = {}
     local pentagramPoints = {}
 
+    local y = playerY
     for i = 1, n do
         local angle = heading + pi + (2 * pi / n) * (i - 1)
         local x = playerX + radius * sin(angle)
-        local y = playerY
         local z = playerZ + radius * cos(angle)
         table.insert(circlePoints, {x = x, y = y, z = z})
     end
@@ -212,7 +212,6 @@ function Breadcrumbs.DrawPentagram(r, num)
     for i = 1, 5 do
         local angle = heading + pi + (2 * pi / 5) * (i - 1)
         local x = playerX + radius * sin(angle)
-        local y = playerY
         local z = playerZ + radius * cos(angle)
         table.insert(pentagramPoints, {x = x, y = y, z = z})
     end

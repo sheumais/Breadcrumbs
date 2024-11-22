@@ -17,12 +17,12 @@
                             <Anchor point="CENTER" relativePoint="CENTER" />
                         </Label>
                         <Button name="$(parent)_Close" inherits="ZO_ButtonBehaviorClickSound">
-							<Dimensions x="24" y="24" />
-							<Anchor point="RIGHT" relativeTo="$(parent)" relativePoint="RIGHT" offsetX="-5" offsetY="-5" />
-							<Textures normal="/esoui/art/buttons/decline_up.dds"
-								pressed="/esoui/art/buttons/decline_down.dds"
-								mouseOver="/esoui/art/buttons/decline_over.dds"
-								disabled="/esoui/art/buttons/decline_disabled.dds" />
+                            <Dimensions x="24" y="24" />
+                            <Anchor point="RIGHT" relativeTo="$(parent)" relativePoint="RIGHT" offsetX="-5" offsetY="-5" />
+                            <Textures normal="/esoui/art/buttons/decline_up.dds"
+                                pressed="/esoui/art/buttons/decline_down.dds"
+                                mouseOver="/esoui/art/buttons/decline_over.dds"
+                                disabled="/esoui/art/buttons/decline_disabled.dds" />
                             <OnClicked>
                                 Breadcrumbs.HideUI()
                             </OnClicked>

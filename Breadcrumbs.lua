@@ -1,6 +1,6 @@
 Breadcrumbs = Breadcrumbs or {}
 Breadcrumbs.name = "Breadcrumbs"
-Breadcrumbs.version = "1.0"
+Breadcrumbs.version = "1.2"
 Breadcrumbs.author = "TheMrPancake"
 Breadcrumbs.title = "|cff7f40Breadcrumbs|r"
 
@@ -29,17 +29,17 @@ function Breadcrumbs.CreateTopLevelControl()
     Breadcrumbs.ctrl:Create3DRenderSpace()
     Breadcrumbs.ctrl:SetHidden( true )
 
-	Breadcrumbs.win = Breadcrumbs.window:CreateTopLevelWindow( "BreadcrumbsWindow" )
+    Breadcrumbs.win = Breadcrumbs.window:CreateTopLevelWindow( "BreadcrumbsWindow" )
     Breadcrumbs.win:SetClampedToScreen( true )
     Breadcrumbs.win:SetMouseEnabled( false )
     Breadcrumbs.win:SetMovable( false )
     Breadcrumbs.win:SetAnchorFill( GuiRoot )
-	Breadcrumbs.win:SetDrawLayer( DL_BACKGROUND )
-	Breadcrumbs.win:SetDrawTier( DT_LOW )
-	Breadcrumbs.win:SetDrawLevel( 0 )
+    Breadcrumbs.win:SetDrawLayer( DL_BACKGROUND )
+    Breadcrumbs.win:SetDrawTier( DT_LOW )
+    Breadcrumbs.win:SetDrawLevel( 0 )
 
-	local frag = ZO_HUDFadeSceneFragment:New( Breadcrumbs.win )
-	HUD_UI_SCENE:AddFragment( frag )
+    local frag = ZO_HUDFadeSceneFragment:New( Breadcrumbs.win )
+    HUD_UI_SCENE:AddFragment( frag )
     HUD_SCENE:AddFragment( frag )
     LOOT_SCENE:AddFragment( frag )
 end
