@@ -87,6 +87,43 @@ local function GetViewCoordinates(wX, wY, wZ)
     return pX * uiW / w, -pY * uiH / h, pZ > 0, scale
 end
 
+local function DrawMarker(x, y, marker, scale)
+    marker:SetAnchor(BOTTOM, GuiRoot, CENTER, x, y)
+    local s = Breadcrumbs.sV.width * 5 * scale
+    marker:SetDimensions(s, s)
+    local r, g, b = unpack(Breadcrumbs.sV.colour)
+    marker:SetColor(r, g, b, Breadcrumbs.sV.alpha)
+end
+
+
+local function DrawMarkers()
+    local loc1 = Breadcrumbs.sV.loc1
+    local loc2 = Breadcrumbs.sV.loc2
+    local scaleFactor = 1. / Breadcrumbs.sV.width
+    if loc1 ~= {} then 
+        local x1, y1, visible1, scale1 = GetViewCoordinates(loc1.x, loc1.y, loc1.z)
+        if visible1 and (scale1 > scaleFactor) then 
+            Breadcrumbs.marker1:SetHidden(false)
+            DrawMarker(x1, y1, Breadcrumbs.marker1, scale1)
+        else 
+            Breadcrumbs.marker1:SetHidden(true)
+        end
+    else 
+        Breadcrumbs.marker1:SetHidden(true)
+    end
+    if loc2 ~= {} then 
+        local x2, y2, visible2, scale2 = GetViewCoordinates(loc2.x, loc2.y, loc2.z)
+        if visible2 and (scale2 > scaleFactor)then 
+            Breadcrumbs.marker2:SetHidden(false)
+            DrawMarker(x2, y2, Breadcrumbs.marker2, scale2)
+        else 
+            Breadcrumbs.marker2:SetHidden(true)
+        end
+    else 
+        Breadcrumbs.marker2:SetHidden(true)
+    end
+end
+
 function Breadcrumbs.InitialiseLine(line)
     line.backdrop:SetAnchorFill()
     local r, g, b = unpack(line.colour)
@@ -108,19 +145,22 @@ function Breadcrumbs.DrawAllLines()
     local linePool = GetLinePool()
     local scaleFactor = 1. / Breadcrumbs.sV.width
     GetMatrixValues()
+    if Breadcrumbs.showUI then 
+        if Breadcrumbs.sV.loc1 ~= {} or Breadcrumbs.sV.loc2 ~= {} then DrawMarkers() end
+    else 
+        Breadcrumbs.marker1:SetHidden(true)
+        Breadcrumbs.marker2:SetHidden(true)
+    end
     for _, line in pairs( linePool ) do
+        if not line.lineControl:IsHidden() then line.lineControl:SetHidden(true) end
         if line.use then 
             local x1, y1, visible1, scale1 = GetViewCoordinates(line.x1, line.y1, line.z1)
             local x2, y2, visible2, scale2 = GetViewCoordinates(line.x2, line.y2, line.z2)
             local scale = max(scale1, scale2)
             if (visible1 or visible2) and (scale > scaleFactor) then
-                line.lineControl:SetHidden(false)
+                if line.lineControl:IsHidden() then line.lineControl:SetHidden(false) end
                 DrawLine(x1, y1, x2, y2, line, scale)
-            else
-                line.lineControl:SetHidden(true)
             end
-        else 
-            line.lineControl:SetHidden(true)
         end
     end
 end

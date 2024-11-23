@@ -18,3 +18,4 @@ FuncLinePool.lua
 Breadcrumbs.xml
 Settings.lua
 Encoding.lua
+Icons.lua

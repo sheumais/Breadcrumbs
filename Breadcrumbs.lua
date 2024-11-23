@@ -21,6 +21,10 @@ Breadcrumbs.defaults = {
     polygon_sides = 8,
     polling = 10,
 }
+Breadcrumbs.iconTextures = {
+    [1] = "Breadcrumbs/icons/one.dds",
+    [2] = "Breadcrumbs/icons/two.dds",
+}
 
 Breadcrumbs.window = GetWindowManager()
 function Breadcrumbs.CreateTopLevelControl()
@@ -130,6 +134,7 @@ local function OnAddOnLoaded(_, name)
     Breadcrumbs.RegisterSettingsPanel()
     Breadcrumbs.ClearLinePool()
     Breadcrumbs.FuncLinePoolLocalise()
+    Breadcrumbs.InitialiseIcons()
     Breadcrumbs.RefreshLines()
     Breadcrumbs.StartPolling()
 
