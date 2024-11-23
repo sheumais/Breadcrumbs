@@ -67,13 +67,32 @@
                                 Breadcrumbs.Loc2()
                             </OnClicked>
                         </Button>
+                        <Button name="$(parent)_Loc2_Pin" inherits="ZO_ButtonBehaviorClickSound">
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)_Loc2" offsetX="-16"/>
+                            <Dimensions x="32" y="32" />
+                            <Textures normal="/esoui/art/worldmap/map_indexicon_locations_up.dds"
+                            mouseOver="/esoui/art/worldmap/map_indexicon_locations_over.dds"
+                            disabled="/esoui/art/worldmap/map_indexicon_locations_disabled.dds" />
+                            <OnClicked>
+                                Breadcrumbs.Loc2FromPos(Breadcrumbs.FindNearestPoint())
+                            </OnClicked>
+                        </Button>
                         <Button name="$(parent)_Loc1" text="Save Loc1" inherits="ZO_DefaultButton">
                             <Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT" relativeTo="$(parent)_Loc2" offsetY="-6"/>
                             <OnClicked>
                                 Breadcrumbs.Loc1()
                             </OnClicked>
                         </Button>
-
+                        <Button name="$(parent)_Loc1_Pin" inherits="ZO_ButtonBehaviorClickSound">
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)_Loc1" offsetX="-16"/>
+                            <Dimensions x="32" y="32" />
+                            <Textures normal="/esoui/art/worldmap/map_indexicon_locations_up.dds"
+                            mouseOver="/esoui/art/worldmap/map_indexicon_locations_over.dds"
+                            disabled="/esoui/art/worldmap/map_indexicon_locations_disabled.dds" />
+                            <OnClicked>
+                                Breadcrumbs.Loc1FromPos(Breadcrumbs.FindNearestPoint())
+                            </OnClicked>
+                        </Button>
                     </Controls>
                 </Control>
                 

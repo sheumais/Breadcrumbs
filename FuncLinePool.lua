@@ -129,6 +129,20 @@ function Breadcrumbs.Loc1() -- /script Breadcrumbs.Loc1()
     }
 end
 
+function Breadcrumbs.Loc1FromPos(X, Y, Z)
+    if type(X) == "table" then
+        local tbl = X
+        X, Y, Z = tbl.x, tbl.y, tbl.z
+    end
+    if X and Y and Z then 
+        Breadcrumbs.sV.loc1 = {
+            x = X,
+            y = Y,
+            z = Z,
+        }
+    end
+end
+
 function Breadcrumbs.Loc2() -- /script Breadcrumbs.Loc2()
     local _, x, y, z = GetUnitRawWorldPosition("player")
     Breadcrumbs.sV.loc2 = {
@@ -136,6 +150,20 @@ function Breadcrumbs.Loc2() -- /script Breadcrumbs.Loc2()
         y = y,
         z = z
     }
+end
+
+function Breadcrumbs.Loc2FromPos(X, Y, Z)
+    if type(X) == "table" then
+        local tbl = X
+        X, Y, Z = tbl.x, tbl.y, tbl.z
+    end
+    if X and Y and Z then 
+        Breadcrumbs.sV.loc2 = {
+            x = X,
+            y = Y,
+            z = Z,
+        }
+    end
 end
 
 function Breadcrumbs.CreateLineFromLocs(colour) -- /script Breadcrumbs.CreateLineFromLocs({1,0,1})
@@ -260,6 +288,47 @@ local function squaredDistance(x1, y1, z1, x2, y2, z2)
     local dy = y2 - y1
     local dz = z2 - z1
     return dx * dx + dy * dy + dz * dz
+end
+
+function Breadcrumbs.FindNearestPoint()
+    InitialiseZone()
+    local zoneId, x, y, z = GetUnitRawWorldPosition("player")
+    local lines = GetSavedZoneLines(zoneId)
+
+    local closest_line_index = nil
+    local min_distance = math.huge
+
+    for index, line in pairs(lines) do
+        local dist1 = squaredDistance(x, y, z, line.x1, line.y1, line.z1)
+        local dist2 = squaredDistance(x, y, z, line.x2, line.y2, line.z2)
+        
+        local closest_dist = min(dist1, dist2)
+        if closest_dist < min_distance then
+            min_distance = closest_dist
+            closest_line_index = index
+        end
+    end
+
+    local closest_line = lines[closest_line_index]
+    local dist1 = squaredDistance(x, y, z, closest_line.x1, closest_line.y1, closest_line.z1)
+    local dist2 = squaredDistance(x, y, z, closest_line.x2, closest_line.y2, closest_line.z2)
+    local closest_dist = min(dist1, dist2)
+
+    if closest_dist == dist1 then 
+        return {
+            x = closest_line.x1,
+            y = closest_line.y1,
+            z = closest_line.z1,
+        }
+    else 
+        return {
+            x = closest_line.x2,
+            y = closest_line.y2,
+            z = closest_line.z2,
+        }
+    end
+
+    return nil
 end
 
 function Breadcrumbs.RemoveClosestLine() -- /script Breadcrumbs.RemoveClosestLine()

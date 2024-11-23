@@ -61,7 +61,7 @@ Breadcrumbs.colour_palette = {
     {name = "Light Blue", colour = {0, 1, 1}},
     {name = "Blue", colour = {0, 0, 1}},
     {name = "Violet", colour = {0.5, 0, 1}},
-    {name = "Magenta", colour = {1, 0, 0.5}},
+    {name = "Magenta", colour = {1, 0, 1}},
     {name = "White", colour = {1, 1, 1}},
     {name = "Black", colour = {0, 0, 0}},
 }
@@ -75,16 +75,20 @@ function Breadcrumbs.InitialiseUI()
     Breadcrumbs.ui.interface = Breadcrumbs_Menu_Window or {}
     Breadcrumbs.ui.square = Breadcrumbs_Menu_Window_Coloured_Square or {}
     Breadcrumbs.ui.colour = Breadcrumbs_Menu_Window_Colour or {}
+    Breadcrumbs.ui.loc1pin = Breadcrumbs_Menu_Window_Button_Group_Loc1_Pin or {}
+    Breadcrumbs.ui.loc2pin = Breadcrumbs_Menu_Window_Button_Group_Loc2_Pin or {}
     local colour_selection_control = Breadcrumbs.ui.colour:GetNamedChild("_Selection")
     Breadcrumbs.ui.combobox = ZO_ComboBox_ObjectFromContainer(colour_selection_control)
     Breadcrumbs.ui.combobox:SetSortsItems(false)
     Breadcrumbs.ui.combobox:SetDropdownFont("ZoFontHeader")
     Breadcrumbs.ui.combobox:SetSpacing(8)
+    Breadcrumbs.ui.loc1pin:SetTextureCoords(1,0,0,1)
+    Breadcrumbs.ui.loc2pin:SetTextureCoords(1,0,0,1)
 
     Breadcrumbs.ui.square:SetColor(unpack(Breadcrumbs.sV.colour or {1, 1, 1}))
     Breadcrumbs.showUI = false
     Breadcrumbs.sV.importString = ""
-    for i, colour in ipairs( Breadcrumbs.colour_palette ) do
+    for i, colour in ipairs( Breadcrumbs.colour_palette ) do -- todo swap button to ZO_ScrollableComboBox and use dye station marker for custom colour
         local entry = Breadcrumbs.ui.combobox:CreateItemEntry(colour.name, Breadcrumbs.SelectColourFromPalette, true)
         entry.colour_index = i
         Breadcrumbs.ui.combobox:AddItem(entry)

@@ -121,7 +121,7 @@ local optionsTable = {
         controls = {
             {
                 type = "description",
-                text = "To draw lines using the draw menu simply save your current location into either location 1 (loc1) or location 2 (loc2) at two different positions, then click draw. This will create a line between these two positions. You can select the colour of the line from a palette using the dropdown, or specify your own colour using the colour picker accessed through the custom button. To remove a line, simply press remove. This will remove the line with the closest endpoint to your current location, not the line segment closest to you. I may change this in future if that is wanted. Finally, you can use the functions below to draw special shapes, such as polygons.",
+                text = "To draw lines using the draw menu simply save your current location into either location 1 (loc1) or location 2 (loc2) at two different positions, then click draw. This will create a line between these two positions.\nUsing the pin icon next to loc1 or loc2 will snap it to the nearest point to you. This is useful for modifying line connections. Also, it reduces the length of your export string.\nYou can select the colour of the line from a palette using the dropdown, or specify your own colour using the colour picker accessed through the custom button.\nTo remove a line, simply press remove. Finally, you can use the functions below to draw special shapes, such as polygons.",
             },
         },
     },
