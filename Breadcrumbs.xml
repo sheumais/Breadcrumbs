@@ -55,7 +55,7 @@
                             </OnClicked>
                         </Button>
                         <Button name="$(parent)_Remove_Button" text="Remove" inherits="ZO_DefaultButton" >
-                            <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="Breadcrumbs_Menu_Window" offsetY="-10"/>
+                            <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="Breadcrumbs_Menu_Window" offsetY="-12"/>
                             <OnClicked>
                                 Breadcrumbs.RemoveClosestLine()
                             </OnClicked>
@@ -99,22 +99,21 @@
                 <Control name="$(parent)_Colour">
                     <Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$(parent)" offsetY="-26"/>
                     <Controls>
-                        <Button name="$(parent)_Custom_Button" text="Custom" inherits="ZO_DefaultButton">
-                            <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$(parent)"/>
+                        <Control name="$(parent)_Selection" inherits="ZO_ScrollableComboBox" mouseEnabled="true" tier="HIGH" >
+                            <Dimensions x="100" y="30" />
+                            <Anchor point="CENTER" relativePoint="CENTER" offsetY="1"/>
+                        </Control>
+                        <Button name="$(parent)_Custom_Button" text="Custom" inherits="ZO_ButtonBehaviorClickSound">
+                            <Dimensions x="32" y="32" />
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)_Selection"/>
+                            <Textures normal="/esoui/art/dye/dyes_categoryicon_up.dds"
+                                pressed="/esoui/art/dye/dyes_categoryicon_down.dds"
+                                mouseOver="/esoui/art/dye/dyes_categoryicon_over.dds"
+                                disabled="/esoui/art/dye/dyes_categoryicon_disabled.dds" />
                             <OnClicked>
                                 Breadcrumbs.ShowColourPicker()
                             </OnClicked>
                         </Button>
-                        <Control name="$(parent)_Selection" inherits="ZO_ComboBox" mouseEnabled="true">
-                        <Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$(parent)_Custom_Button" offsetX="12"/>
-                        <Dimensions x="32" y="48"/>
-                            <Controls>
-                                <Backdrop name="$(parent)BG" override="true" hidden="true" />
-                                <Button name="$(parent)_OpenDropdown" override="true">
-                                    <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT"/>
-                                </Button>
-                            </Controls>
-                        </Control>
                     </Controls>
                 </Control>
 
