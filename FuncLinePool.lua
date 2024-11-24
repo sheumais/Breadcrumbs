@@ -201,6 +201,8 @@ function Breadcrumbs.DrawPolygon(r, n, colour)
         table.insert(points, {x = x, y = y, z = z})
     end
 
+    local line_table = {}
+
     for i = 1, n do
         local sP = points[i]
         local eP = points[i % n + 1]
@@ -210,12 +212,28 @@ function Breadcrumbs.DrawPolygon(r, n, colour)
             colour or Breadcrumbs.sV.colour or {1, 1, 1}
         )
         if line then
-            table.insert(Breadcrumbs.sV.savedLines[zoneId], line)
+            table.insert(line_table, line)
         end
     end
 
+    return line_table
+end
+
+function Breadcrumbs.PreviewPolygon(r, n, colour) -- /script Breadcrumbs.PreviewPolygon(Breadcrumbs.sV.polygon_radius, Breadcrumbs.sV.polygon_sides, Breadcrumbs.sV.colour)
     RefreshLines()
-    return zoneId
+    local lines = Breadcrumbs.DrawPolygon(r, n, colour)
+    for _, line in pairs( lines ) do
+        AddLineToPool(line.x1, line.y1, line.z1, line.x2, line.y2, line.z2, line.colour)
+    end
+end
+
+function Breadcrumbs.PlacePolygon(r, n, colour)
+    local lines = Breadcrumbs.DrawPolygon(r, n, colour)
+    for _, line in pairs( lines ) do
+        Breadcrumbs.CreateSavedZoneLine(line.x1, line.y1, line.z1, line.x2, line.y2, line.z2, line.colour)
+        d(line.colour)
+    end
+    RefreshLines()
 end
 
 function Breadcrumbs.DrawPentagram(r, num)

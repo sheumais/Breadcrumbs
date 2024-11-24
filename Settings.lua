@@ -166,9 +166,15 @@ local optionsTable = {
             },
             {
                 type = "button",
+                name = "Preview Polygon",
+                tooltip = "Draw a temporary view of your polygon. This will disappear when changing any lines or reloading ui.",
+                func = function(value) Breadcrumbs.PreviewPolygon(Breadcrumbs.sV.polygon_radius, Breadcrumbs.sV.polygon_sides, Breadcrumbs.sV.colour) end,
+            },
+            {
+                type = "button",
                 name = "Draw Polygon",
                 tooltip = "Draws the defined polygon centered around your current location",
-                func = function(value) Breadcrumbs.DrawPolygon(Breadcrumbs.sV.polygon_radius, Breadcrumbs.sV.polygon_sides, Breadcrumbs.sV.colour) end,
+                func = function(value) Breadcrumbs.PlacePolygon(Breadcrumbs.sV.polygon_radius, Breadcrumbs.sV.polygon_sides, Breadcrumbs.sV.colour) end,
             },
         },
     },

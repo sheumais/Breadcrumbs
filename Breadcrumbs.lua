@@ -1,6 +1,6 @@
 Breadcrumbs = Breadcrumbs or {}
 Breadcrumbs.name = "Breadcrumbs"
-Breadcrumbs.version = "1.2"
+Breadcrumbs.version = "1.3"
 Breadcrumbs.author = "TheMrPancake"
 Breadcrumbs.title = "|cff7f40Breadcrumbs|r"
 
@@ -88,10 +88,24 @@ function Breadcrumbs.InitialiseUI()
     Breadcrumbs.ui.square:SetColor(unpack(Breadcrumbs.sV.colour or {1, 1, 1}))
     Breadcrumbs.showUI = false
     Breadcrumbs.sV.importString = ""
-    for i, colour in ipairs( Breadcrumbs.colour_palette ) do -- todo swap button to ZO_ScrollableComboBox and use dye station marker for custom colour
+
+    local function compareTables(table1, table2)
+        if #table1 ~= #table2 then return false end
+        for i = 1, #table1 do
+            if table1[i] ~= table2[i] then
+                return false
+            end
+        end
+        return true
+    end
+
+    for i, colour in ipairs( Breadcrumbs.colour_palette ) do
         local entry = Breadcrumbs.ui.combobox:CreateItemEntry(colour.name, Breadcrumbs.SelectColourFromPalette, true)
         entry.colour_index = i
         Breadcrumbs.ui.combobox:AddItem(entry)
+        if compareTables(Breadcrumbs.sV.colour, colour.colour) then
+            Breadcrumbs.ui.combobox:SetSelectedItemText(colour.name)
+        end
     end
 end
 

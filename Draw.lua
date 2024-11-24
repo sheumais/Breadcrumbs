@@ -25,6 +25,28 @@ function Breadcrumbs.StartPolling()
     EVENT_MANAGER:RegisterForUpdate( Breadcrumbs.name .. "Update", Breadcrumbs.sV.polling, DrawAllLines )
 end
 
+-- function Breadcrumbs.EnablePreview()
+--     EVENT_MANAGER:UnregisterForUpdate( Breadcrumbs.name .. "Preview" )
+--     EVENT_MANAGER:RegisterForUpdate( Breadcrumbs.name .. "Preview", Breadcrumbs.sV.polling * 2, Breadcrumbs.DrawPreview )
+-- end
+
+-- function Breadcrumbs.DisablePreview()
+--     EVENT_MANAGER:UnregisterForUpdate( Breadcrumbs.name .. "Preview" )
+-- end
+
+-- local preview = false
+-- function Breadcrumbs.TogglePreview()
+--     d(preview)
+--     if preview then 
+--         preview = false 
+--         Breadcrumbs.DisablePreview()
+--         Breadcrumbs.RefreshLines()
+--     else
+--         preview = true 
+--         Breadcrumbs.EnablePreview() 
+--     end
+-- end
+
 ---------------------------------------------------------------------
 -- Convert in-world coordinates to view via fancy linear algebra.
 -- This is ripped almost entirely from OSI, with only minor changes
@@ -171,3 +193,8 @@ function Breadcrumbs.HideAllLines()
         line.lineControl:SetHidden(true) 
     end
 end
+
+-- function Breadcrumbs.DrawPreview()
+--     Breadcrumbs.RefreshLines()
+--     Breadcrumbs.PreviewPolygon(Breadcrumbs.sV.polygon_radius, Breadcrumbs.sV.polygon_sides, Breadcrumbs.sV.colour)
+-- end
