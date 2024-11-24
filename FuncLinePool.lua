@@ -231,7 +231,6 @@ function Breadcrumbs.PlacePolygon(r, n, colour)
     local lines = Breadcrumbs.DrawPolygon(r, n, colour)
     for _, line in pairs( lines ) do
         Breadcrumbs.CreateSavedZoneLine(line.x1, line.y1, line.z1, line.x2, line.y2, line.z2, line.colour)
-        d(line.colour)
     end
     RefreshLines()
 end

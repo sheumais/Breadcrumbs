@@ -36,7 +36,6 @@ end
 
 -- local preview = false
 -- function Breadcrumbs.TogglePreview()
---     d(preview)
 --     if preview then 
 --         preview = false 
 --         Breadcrumbs.DisablePreview()
