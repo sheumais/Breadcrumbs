@@ -50,6 +50,7 @@ function Breadcrumbs.AddLineToPool( x1, y1, z1, x2, y2, z2, colour --[[ Nilable 
     line.x1, line.y1, line.z1 = x1, y1, z1
     line.x2, line.y2, line.z2 = x2, y2, z2
     line.colour = colour or Breadcrumbs.sV.colour or {1, 1, 1}
+    Breadcrumbs.InitialiseLine(line)
     return line
 end
 
@@ -76,7 +77,7 @@ function Breadcrumbs.NilLinePool()
     end
 end
 
-function Breadcrumbs.GetSavedZoneLines(zoneId)
+function Breadcrumbs.GetSavedZoneLines(zoneId) -- /script Breadcrumbs.GetSavedZoneLines(Breadcrumbs.GetZoneId())
     return Breadcrumbs.sV.savedLines[zoneId] or {}
 end
 
