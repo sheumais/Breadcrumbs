@@ -92,7 +92,7 @@ local optionsTable = {
                 decimals = 2,
                 default = Breadcrumbs.interval,
                 getFunc = function() return Breadcrumbs.sV.alpha end,
-                setFunc = function(value) Breadcrumbs.sV.alpha = value end,
+                setFunc = function(value) Breadcrumbs.StopPolling() Breadcrumbs.sV.alpha = value Breadcrumbs.StartPolling() end,
             },
             {
                 type = "slider",

@@ -89,6 +89,9 @@ local function GetMatrixValues()
     i42 = -( rX * fY * cZ + rY * fZ * cX + rZ * fX * cY - rZ * fY * cX - rY * fX * cZ - rX * fZ * cY )
     i43 = -( rZ * uY * cX + rY * uX * cZ + rX * uZ * cY - rX * uY * cZ - rY * uZ * cX - rZ * uX * cY )
 end
+
+Breadcrumbs.GetMatrixValues = GetMatrixValues
+
 local function GetViewCoordinates(wX, wY, wZ)
     -- calculate unit view position
     local pX = wX * i11 + wY * i21 + wZ * i31 + i41
@@ -107,6 +110,8 @@ local function GetViewCoordinates(wX, wY, wZ)
 
     return pX * uiW / w, -pY * uiH / h, pZ > 0, scale
 end
+
+Breadcrumbs.GetViewCoordinates = GetViewCoordinates
 
 local function DrawMarker(x, y, marker, scale)
     marker:SetAnchor(BOTTOM, GuiRoot, CENTER, x, y)

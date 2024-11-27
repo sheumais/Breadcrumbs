@@ -1,6 +1,6 @@
 Breadcrumbs = Breadcrumbs or {}
 Breadcrumbs.name = "Breadcrumbs"
-Breadcrumbs.version = "1.4"
+Breadcrumbs.version = "1.5"
 Breadcrumbs.author = "TheMrPancake"
 Breadcrumbs.title = "|cff7f40Breadcrumbs|r"
 
