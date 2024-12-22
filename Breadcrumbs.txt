@@ -19,3 +19,4 @@ Breadcrumbs.xml
 Settings.lua
 Encoding.lua
 Icons.lua
+Recording.lua

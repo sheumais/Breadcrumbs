@@ -20,6 +20,7 @@ Breadcrumbs.defaults = {
     polygon_radius = 5,
     polygon_sides = 8,
     polling = 10,
+    recording = 250,
 }
 Breadcrumbs.iconTextures = {
     [1] = "Breadcrumbs/icons/one.dds",
