@@ -81,7 +81,7 @@ local optionsTable = {
                 max = 24,
                 default = Breadcrumbs.defaults.width,
                 getFunc = function() return Breadcrumbs.sV.width end,
-                setFunc = function(value) Breadcrumbs.sV.width = value end,
+                setFunc = function(value) Breadcrumbs.sV.width = value Breadcrumbs.scaleFactor = 1. / Breadcrumbs.sV.width end,
             },
             {
                 type = "slider",
@@ -180,43 +180,6 @@ local optionsTable = {
     },
     {
         type = "submenu",
-        name = "Pentagram",
-        controls = {
-            {
-                type = "description",
-                text = "Similar to polygon, but a pentagram because it looks cool. I mainly used this to test, but thought maybe someone could use the function. Uses your selected brush colour from the draw menu.",
-            },
-            {
-                type = "slider",
-                name = "Number of sides",
-                min = 5,
-                max = 32,
-                default = Breadcrumbs.defaults.polygon_sides,
-                getFunc = function() return Breadcrumbs.sV.polygon_sides end,
-                setFunc = function(value) Breadcrumbs.sV.polygon_sides = value end,
-                clampInput = true,
-            },
-            {
-                type = "slider",
-                name = "Radius of shape",
-                min = 1,
-                max = 24,
-                step = 1,
-                default = Breadcrumbs.defaults.polygon_radius,
-                getFunc = function() return Breadcrumbs.sV.polygon_radius end,
-                setFunc = function(value) Breadcrumbs.sV.polygon_radius = value end,
-                clampInput = true,
-            },
-            {
-                type = "button",
-                name = "Draw Pentagram",
-                tooltip = "Draws the defined polygon centered around your current location",
-                func = function(value) Breadcrumbs.DrawPentagram(Breadcrumbs.sV.polygon_radius, Breadcrumbs.sV.polygon_sides) end,
-            },
-        },
-    },
-    {
-        type = "submenu",
         name = "3D Axis",
         controls = {
             {
@@ -227,6 +190,35 @@ local optionsTable = {
                 type = "button",
                 name = "Draw Axis",
                 func = function(value) Breadcrumbs.Generate3DAxisLines() end,
+            },
+        },
+    },
+    {
+        type = "header",
+        name = "Recording",
+    },
+    {
+        type = "submenu",
+        name = "Recording",
+        controls = {
+            {
+                type = "button",
+                name = "Start/Stop Recording",
+                func = function(value) Breadcrumbs.ToggleRecording() end,
+            },
+            {
+                type = "slider",
+                name = "Polling Frequency (ms)",
+                min = 10,
+                max = 1000,
+                default = Breadcrumbs.defaults.recording,
+                getFunc = function() return Breadcrumbs.sV.recording end,
+                setFunc = function(value) Breadcrumbs.SetRecordingSpeed(value) end,
+            },
+            {
+                type = "button",
+                name = "Draw Recording",
+                func = function(value) Breadcrumbs.DrawRecording() end,
             },
         },
     },

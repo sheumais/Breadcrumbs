@@ -1,6 +1,6 @@
 Breadcrumbs = Breadcrumbs or {}
 Breadcrumbs.name = "Breadcrumbs"
-Breadcrumbs.version = "1.5"
+Breadcrumbs.version = "1.6"
 Breadcrumbs.author = "TheMrPancake"
 Breadcrumbs.title = "|cff7f40Breadcrumbs|r"
 
@@ -50,8 +50,10 @@ function Breadcrumbs.CreateTopLevelControl()
 end
 
 function Breadcrumbs.LoadSavedZoneLines(event)
-    Breadcrumbs.InitialiseZone()
-    Breadcrumbs.RefreshLines()
+    if Breadcrumbs.recording ~= true then
+        Breadcrumbs.InitialiseZone()
+        Breadcrumbs.RefreshLines()
+    end
 end
 
 Breadcrumbs.colour_palette = {

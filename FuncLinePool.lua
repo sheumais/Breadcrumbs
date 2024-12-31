@@ -236,64 +236,6 @@ function Breadcrumbs.PlacePolygon(r, n, colour)
     RefreshLines()
 end
 
-function Breadcrumbs.DrawPentagram(r, num)
-    if r <= 0.99 then return end
-    InitialiseZone()
-    local zoneId, playerX, playerY, playerZ = GetUnitRawWorldPosition("player")
-    local radius = r * 100
-    local _, _, heading = GetMapPlayerPosition("player")
-    local n = num or 32
-
-    local circlePoints = {}
-    local pentagramPoints = {}
-
-    local y = playerY
-    for i = 1, n do
-        local angle = heading + pi + (2 * pi / n) * (i - 1)
-        local x = playerX + radius * sin(angle)
-        local z = playerZ + radius * cos(angle)
-        table.insert(circlePoints, {x = x, y = y, z = z})
-    end
-
-    for i = 1, 5 do
-        local angle = heading + pi + (2 * pi / 5) * (i - 1)
-        local x = playerX + radius * sin(angle)
-        local z = playerZ + radius * cos(angle)
-        table.insert(pentagramPoints, {x = x, y = y, z = z})
-    end
-
-    for i = 1, n do
-        local sP = circlePoints[i]
-        local eP = circlePoints[i % n + 1]
-        local line = CreateLinePrimitive(
-            sP.x, sP.y, sP.z,
-            eP.x, eP.y, eP.z,
-            Breadcrumbs.sV.colour or {1, 0, 0}
-        )
-        if line then
-            table.insert(Breadcrumbs.sV.savedLines[zoneId], line)
-        end
-    end
-
-    local starIndices = {1, 3, 5, 2, 4, 1}
-    for i = 1, #starIndices - 1 do
-        local sP = pentagramPoints[starIndices[i]]
-        local eP = pentagramPoints[starIndices[i + 1]]
-        local line = CreateLinePrimitive(
-            sP.x, sP.y, sP.z,
-            eP.x, eP.y, eP.z,
-            Breadcrumbs.sV.colour or {1, 0, 0}
-        )
-        if line then
-            table.insert(Breadcrumbs.sV.savedLines[zoneId], line)
-        end
-    end
-
-    RefreshLines()
-    return zoneId
-end
-
-
 function Breadcrumbs.PopulateZoneLinesFromTable(zoneId, lines)
     Breadcrumbs.InitialiseExternalZone(zoneId)
     for _, line in pairs(lines) do

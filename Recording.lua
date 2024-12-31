@@ -2,6 +2,7 @@ Breadcrumbs = Breadcrumbs or {}
 
 local lineStorage = {}
 local oldPos = {nil, nil, nil}
+Breadcrumbs.recording = false
 
 local function ArePositionsEqual(pos1, pos2)
     if not pos1 or not pos2 then return false end
@@ -10,26 +11,33 @@ end
 
 local function TakePositionSnapshot()
     local _, x, y, z = GetUnitRawWorldPosition("player")
-    if ArePositionsEqual(oldPos, {nil, nil, nil}) then
-        oldPos = {x, y, z}
-    end
-    if not ArePositionsEqual(oldPos, {x, y, z}) then
+    if not ArePositionsEqual(oldPos, {nil, nil, nil}) and not ArePositionsEqual(oldPos, {x, y, z}) then
         local line = Breadcrumbs.AddLineToPool(oldPos[1], oldPos[2], oldPos[3], x, y, z)
         table.insert(lineStorage, line)
-        oldPos = {x, y, z}
     end
+    oldPos = {x, y, z}
 end
 
-function Breadcrumbs.StartRecording()
+function Breadcrumbs.StartRecording() -- /script Breadcrumbs.StartRecording()
     Breadcrumbs.RefreshLines()
     lineStorage = {}
     oldPos = {nil, nil, nil}
+    Breadcrumbs.recording = true
     EVENT_MANAGER:UnregisterForUpdate( Breadcrumbs.name .. "Record")
     EVENT_MANAGER:RegisterForUpdate( Breadcrumbs.name .. "Record", Breadcrumbs.sV.recording, TakePositionSnapshot )
 end
 
-function Breadcrumbs.StopRecording()
+function Breadcrumbs.StopRecording() -- /script Breadcrumbs.StopRecording()
     EVENT_MANAGER:UnregisterForUpdate( Breadcrumbs.name .. "Record")
+    Breadcrumbs.recording = false
+end
+
+function Breadcrumbs.ToggleRecording()
+    if Breadcrumbs.recording == true then 
+        Breadcrumbs.StopRecording()
+    else
+        Breadcrumbs.StartRecording()
+    end
 end
 
 function Breadcrumbs.SetRecordingSpeed(value)
@@ -39,11 +47,13 @@ function Breadcrumbs.SetRecordingSpeed(value)
 end
 
 function Breadcrumbs.DrawRecording() 
-    InitialiseZone()
-    local zoneId = GetZoneId()
+    if Breadcrumbs.recording == true then Breadcrumbs.StopRecording() end
+    Breadcrumbs.InitialiseZone()
+    local zoneId = Breadcrumbs.GetZoneId()
     for _, line in pairs(lineStorage) do
         if line then
             table.insert(Breadcrumbs.sV.savedLines[zoneId], line)
         end
     end
+    Breadcrumbs.RefreshLines()
 end

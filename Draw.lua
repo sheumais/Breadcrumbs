@@ -1,6 +1,6 @@
 Breadcrumbs = Breadcrumbs or {}
 
-local DrawLine, GetLinePool, DrawAllLines, sqrt, atan, max, abs, uiW, uiH
+local DrawLine, GetLinePool, DrawAllLines, sqrt, atan, min, abs, uiW, uiH
 
 function Breadcrumbs.StopPolling()
     EVENT_MANAGER:UnregisterForUpdate( Breadcrumbs.name .. "Update" )
@@ -13,38 +13,18 @@ function Breadcrumbs.StartPolling()
     uiW, uiH = GuiRoot:GetDimensions()
     sqrt = math.sqrt
     atan = math.atan
-    max = math.max
+    min = math.min
     abs = math.abs
     local linePool = GetLinePool()
     -- local _, x, y, z = GetUnitRawWorldPosition("player")
     for _, line in pairs( linePool ) do
         Breadcrumbs.InitialiseLine(line)
     end
+    Breadcrumbs.scaleFactor = 1. / Breadcrumbs.sV.width
 
     EVENT_MANAGER:UnregisterForUpdate( Breadcrumbs.name .. "Update" )
     EVENT_MANAGER:RegisterForUpdate( Breadcrumbs.name .. "Update", Breadcrumbs.sV.polling, DrawAllLines )
 end
-
--- function Breadcrumbs.EnablePreview()
---     EVENT_MANAGER:UnregisterForUpdate( Breadcrumbs.name .. "Preview" )
---     EVENT_MANAGER:RegisterForUpdate( Breadcrumbs.name .. "Preview", Breadcrumbs.sV.polling * 2, Breadcrumbs.DrawPreview )
--- end
-
--- function Breadcrumbs.DisablePreview()
---     EVENT_MANAGER:UnregisterForUpdate( Breadcrumbs.name .. "Preview" )
--- end
-
--- local preview = false
--- function Breadcrumbs.TogglePreview()
---     if preview then 
---         preview = false 
---         Breadcrumbs.DisablePreview()
---         Breadcrumbs.RefreshLines()
---     else
---         preview = true 
---         Breadcrumbs.EnablePreview() 
---     end
--- end
 
 ---------------------------------------------------------------------
 -- Convert in-world coordinates to view via fancy linear algebra.
@@ -108,7 +88,7 @@ local function GetViewCoordinates(wX, wY, wZ)
     local dist = 1 + sqrt( dX * dX + dY * dY + dZ * dZ )
     local scale = 2000 / dist or 1
 
-    return pX * uiW / w, -pY * uiH / h, pZ > 0, scale
+    return pX * uiW / w, -pY * uiH / h, pZ > 100, scale
 end
 
 Breadcrumbs.GetViewCoordinates = GetViewCoordinates
@@ -124,11 +104,10 @@ end
 
 local function DrawMarkers()
     local loc1 = Breadcrumbs.sV.loc1
-    local loc2 = Breadcrumbs.sV.loc2
-    local scaleFactor = 1. / Breadcrumbs.sV.width
+    local loc2 = Breadcrumbs.sV.loc2h
     if loc1 ~= {} then 
         local x1, y1, visible1, scale1 = GetViewCoordinates(loc1.x, loc1.y, loc1.z)
-        if visible1 and (scale1 > scaleFactor) then 
+        if visible1 and (scale1 > Breadcrumbs.scaleFactor) then 
             Breadcrumbs.marker1:SetHidden(false)
             DrawMarker(x1, y1, Breadcrumbs.marker1, scale1)
         else 
@@ -139,7 +118,7 @@ local function DrawMarkers()
     end
     if loc2 ~= {} then 
         local x2, y2, visible2, scale2 = GetViewCoordinates(loc2.x, loc2.y, loc2.z)
-        if visible2 and (scale2 > scaleFactor)then 
+        if visible2 and (scale2 > Breadcrumbs.scaleFactor)then 
             Breadcrumbs.marker2:SetHidden(false)
             DrawMarker(x2, y2, Breadcrumbs.marker2, scale2)
         else 
@@ -169,7 +148,6 @@ end
 
 function Breadcrumbs.DrawAllLines()
     local linePool = GetLinePool()
-    local scaleFactor = 1. / Breadcrumbs.sV.width
     GetMatrixValues()
     if Breadcrumbs.showUI then 
         if Breadcrumbs.sV.loc1 ~= {} or Breadcrumbs.sV.loc2 ~= {} then DrawMarkers() end
@@ -178,15 +156,18 @@ function Breadcrumbs.DrawAllLines()
         Breadcrumbs.marker2:SetHidden(true)
     end
     for _, line in pairs( linePool ) do
-        if not line.lineControl:IsHidden() then line.lineControl:SetHidden(true) end
         if line.use then 
             local x1, y1, visible1, scale1 = GetViewCoordinates(line.x1, line.y1, line.z1)
             local x2, y2, visible2, scale2 = GetViewCoordinates(line.x2, line.y2, line.z2)
-            local scale = max(scale1, scale2)
-            if (visible1 or visible2) and (scale > scaleFactor) then
+            local scale = min(scale1, scale2)
+            if (visible1 or visible2) and (scale > Breadcrumbs.scaleFactor) then
                 if line.lineControl:IsHidden() then line.lineControl:SetHidden(false) end
                 DrawLine(x1, y1, x2, y2, line, scale)
+            else 
+                line.lineControl:SetHidden(true) 
             end
+        else
+            line.lineControl:SetHidden(true) 
         end
     end
 end
@@ -197,8 +178,3 @@ function Breadcrumbs.HideAllLines()
         line.lineControl:SetHidden(true) 
     end
 end
-
--- function Breadcrumbs.DrawPreview()
---     Breadcrumbs.RefreshLines()
---     Breadcrumbs.PreviewPolygon(Breadcrumbs.sV.polygon_radius, Breadcrumbs.sV.polygon_sides, Breadcrumbs.sV.colour)
--- end
