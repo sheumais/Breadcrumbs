@@ -104,7 +104,7 @@ end
 
 local function DrawMarkers()
     local loc1 = Breadcrumbs.sV.loc1
-    local loc2 = Breadcrumbs.sV.loc2h
+    local loc2 = Breadcrumbs.sV.loc2
     if loc1 ~= {} then 
         local x1, y1, visible1, scale1 = GetViewCoordinates(loc1.x, loc1.y, loc1.z)
         if visible1 and (scale1 > Breadcrumbs.scaleFactor) then 
