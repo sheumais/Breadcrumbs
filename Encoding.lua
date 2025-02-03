@@ -174,9 +174,6 @@ function Breadcrumbs.DecodeImportStringToZoneLines()
         local hex_colour = nextString()
         local colour_hex = tonumber(hex_colour, 16)
         local r, g, b = hexToRGB(colour_hex)
-        if r == 255 and g == 127 and b == 128 then -- temporary fix because I messed up colour stuff
-            b = 0
-        end
         colour_table_indexes[i] = {r / 255, g / 255, b / 255}
     end
 

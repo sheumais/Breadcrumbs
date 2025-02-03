@@ -21,6 +21,7 @@ Breadcrumbs.defaults = {
     polygon_sides = 8,
     polling = 10,
     recording = 250,
+    minimumScale = 0.15,
 }
 Breadcrumbs.iconTextures = {
     [1] = "Breadcrumbs/icons/one.dds",
@@ -116,6 +117,8 @@ function Breadcrumbs.HideUI()
     Breadcrumbs.ui.interface = Breadcrumbs_Menu_Window or {}
     Breadcrumbs.ui.interface:SetHidden(true)
     Breadcrumbs.showUI = false
+    Breadcrumbs.marker1:SetHidden(true)
+    Breadcrumbs.marker2:SetHidden(true)
 end
 
 function Breadcrumbs.ShowUI()

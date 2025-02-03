@@ -72,6 +72,7 @@ end
 
 Breadcrumbs.GetMatrixValues = GetMatrixValues
 
+-- legacy function used for markers only and compatibility with other addons
 local function GetViewCoordinates(wX, wY, wZ)
     -- calculate unit view position
     local pX = wX * i11 + wY * i21 + wZ * i31 + i41
@@ -88,10 +89,48 @@ local function GetViewCoordinates(wX, wY, wZ)
     local dist = 1 + sqrt( dX * dX + dY * dY + dZ * dZ )
     local scale = 2000 / dist or 1
 
-    return pX * uiW / w, -pY * uiH / h, pZ > 100, scale
+    return pX * uiW / w, -pY * uiH / h, pZ > 0, scale
 end
 
 Breadcrumbs.GetViewCoordinates = GetViewCoordinates
+
+local function CalculateView(wX1, wY1, wZ1, wX2, wY2, wZ2)
+    local pX1 = wX1 * i11 + wY1 * i21 + wZ1 * i31 + i41
+    local pY1 = wX1 * i12 + wY1 * i22 + wZ1 * i32 + i42
+    local pZ1 = wX1 * i13 + wY1 * i23 + wZ1 * i33 + i43
+    local pX2 = wX2 * i11 + wY2 * i21 + wZ2 * i31 + i41
+    local pY2 = wX2 * i12 + wY2 * i22 + wZ2 * i32 + i42
+    local pZ2 = wX2 * i13 + wY2 * i23 + wZ2 * i33 + i43
+
+
+    local nearZ = 0.1  -- define near clipping plane
+    if pZ1 < nearZ and pZ2 < nearZ then -- both points behind the near plane, discard the line
+        return nil
+    end
+    if pZ1 < 0 or pZ2 < 0 then -- find point on near-clipping plane
+        local t = (nearZ - pZ1) / (pZ2 - pZ1)
+        local clipX = pX1 + t * (pX2 - pX1)
+        local clipY = pY1 + t * (pY2 - pY1)
+        if pZ1 < 0 then -- only one of z1 or z2 can be < 0
+            pX1, pY1, pZ1 = clipX, clipY, nearZ
+        else 
+            pX2, pY2, pZ2 = clipX, clipY, nearZ
+        end
+    end
+
+    local w1, h1 = GetWorldDimensionsOfViewFrustumAtDepth(pZ1)
+    local w2, h2 = GetWorldDimensionsOfViewFrustumAtDepth(pZ2)
+    
+    local dX1, dY1, dZ1 = wX1 - cX, wY1 - cY, wZ1 - cZ
+    local dist1 = dX1 * dX1 + dY1 * dY1 + dZ1 * dZ1
+    local scale1 = 4e6 / dist1
+    local dX2, dY2, dZ2 = wX2 - cX, wY2 - cY, wZ2 - cZ
+    local dist2 = dX2 * dX2 + dY2 * dY2 + dZ2 * dZ2
+    local scale2 = 4e6 / dist2
+    local scale = sqrt(min(scale1, scale2))
+
+    return pX1 * uiW / w1, -pY1 * uiH / h1, pX2 * uiW / w2, -pY2 * uiH / h2, scale
+end
 
 local function DrawMarker(x, y, marker, scale)
     marker:SetAnchor(BOTTOM, GuiRoot, CENTER, x, y)
@@ -100,7 +139,6 @@ local function DrawMarker(x, y, marker, scale)
     local r, g, b = unpack(Breadcrumbs.sV.colour)
     marker:SetColor(r, g, b, Breadcrumbs.sV.alpha)
 end
-
 
 local function DrawMarkers()
     local loc1 = Breadcrumbs.sV.loc1
@@ -146,25 +184,20 @@ function Breadcrumbs.DrawLine(x1, y1, x2, y2, line, scale)
     line.lineControl:SetTransformRotationZ(-angle)
 end
 
-function Breadcrumbs.DrawAllLines()
+function Breadcrumbs.DrawAllLines() -- use TextureCompositeControl ?
     local linePool = GetLinePool()
     GetMatrixValues()
     if Breadcrumbs.showUI then 
-        if Breadcrumbs.sV.loc1 ~= {} or Breadcrumbs.sV.loc2 ~= {} then DrawMarkers() end
-    else 
-        Breadcrumbs.marker1:SetHidden(true)
-        Breadcrumbs.marker2:SetHidden(true)
+        DrawMarkers()
     end
     for _, line in pairs( linePool ) do
         if line.use then 
-            local x1, y1, visible1, scale1 = GetViewCoordinates(line.x1, line.y1, line.z1)
-            local x2, y2, visible2, scale2 = GetViewCoordinates(line.x2, line.y2, line.z2)
-            local scale = min(scale1, scale2)
-            if (visible1 or visible2) and (scale > Breadcrumbs.scaleFactor) then
-                if line.lineControl:IsHidden() then line.lineControl:SetHidden(false) end
+            local x1, y1, x2, y2, scale = CalculateView(line.x1, line.y1, line.z1, line.x2, line.y2, line.z2)
+            if x1 and y1 and x2 and y2 and scale >= Breadcrumbs.sV.minimumScale then 
                 DrawLine(x1, y1, x2, y2, line, scale)
+                line.lineControl:SetHidden(false)
             else 
-                line.lineControl:SetHidden(true) 
+                line.lineControl:SetHidden(true)
             end
         else
             line.lineControl:SetHidden(true) 

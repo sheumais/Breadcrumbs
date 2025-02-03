@@ -104,6 +104,17 @@ local optionsTable = {
                 getFunc = function() return Breadcrumbs.sV.polling end,
                 setFunc = function(value) Breadcrumbs.sV.polling = value Breadcrumbs.StopPolling() Breadcrumbs.StartPolling() end,
             },
+            {
+                type = "slider",
+                name = "Minimum line scale",
+                min = 0.0,
+                max = 0.4,
+                step = 0.01,
+                decimals = 2,
+                default = Breadcrumbs.defaults.minimumScale,
+                getFunc = function() return Breadcrumbs.sV.minimumScale end,
+                setFunc = function(value) Breadcrumbs.sV.minimumScale = value end,
+            },
         },
     },
     {
