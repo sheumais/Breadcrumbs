@@ -2,8 +2,8 @@
 ## Description: Draw lines with /breadcrumbs
 ## Author: TheMrPancake
 ## DependsOn: LibAddonMenu-2.0>=37
-## APIVersion: 101044
-## AddOnVersion: 7
+## APIVersion: 101046
+## AddOnVersion: 8
 ## SavedVariables: BreadcrumbsSavedVariables
 
 ; This Add-on is not created by, affiliated with or sponsored by ZeniMax Media Inc. or its affiliates. 

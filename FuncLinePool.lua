@@ -236,6 +236,21 @@ function Breadcrumbs.PlacePolygon(r, n, colour)
     RefreshLines()
 end
 
+local function CreateTemporaryLine(line, time)
+    local added_line = AddLineToPool(line.x1, line.y1, line.z1, line.x2, line.y2, line.z2, line.colour)
+    zo_callLater(function() 
+        Breadcrumbs.DiscardLine(added_line)
+    end, time)
+end 
+
+Breadcrumbs.CreateTemporaryLine = CreateTemporaryLine
+
+function Breadcrumbs.CreateTemporaryLines(lines, time)
+    for i, line in pairs( lines ) do
+        CreateTemporaryLine(line, time)
+    end
+end
+
 function Breadcrumbs.PopulateZoneLinesFromTable(zoneId, lines)
     Breadcrumbs.InitialiseExternalZone(zoneId)
     for _, line in pairs(lines) do
