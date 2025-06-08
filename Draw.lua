@@ -174,12 +174,12 @@ function Breadcrumbs.DrawAllLines()
     local linePool = GetLinePool()
     local old_hash = hash
     GetMatrixValues()
-    if (old_hash == hash) then return end
     if Breadcrumbs.showUI then 
         DrawMarkers()
     end
     for _, line in pairs( linePool ) do
         if line.use then 
+            if (old_hash == hash) then return end
             local x1, y1, x2, y2, scale = CalculateView(line.x1, line.y1, line.z1, line.x2, line.y2, line.z2)
             if x1 and y1 and x2 and y2 and scale >= Breadcrumbs.sV.minimumScale then 
                 DrawLine(x1, y1, x2, y2, line, scale)
