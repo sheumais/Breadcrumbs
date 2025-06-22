@@ -182,7 +182,7 @@ function Breadcrumbs.CreateLineFromLocs(colour) -- /script Breadcrumbs.CreateLin
     return zoneId
 end
 
-function Breadcrumbs.DrawPolygon(r, n, colour)
+function Breadcrumbs.CreatePolygon(r, n, colour)
     if n < 3 then return end
     InitialiseZone()
     local zoneId, playerX, playerY, playerZ = GetUnitRawWorldPosition("player")
@@ -222,14 +222,14 @@ end
 
 function Breadcrumbs.PreviewPolygon(r, n, colour) -- /script Breadcrumbs.PreviewPolygon(Breadcrumbs.sV.polygon_radius, Breadcrumbs.sV.polygon_sides, Breadcrumbs.sV.colour)
     RefreshLines()
-    local lines = Breadcrumbs.DrawPolygon(r, n, colour)
+    local lines = Breadcrumbs.CreatePolygon(r, n, colour)
     for _, line in pairs( lines ) do
         AddLineToPool(line.x1, line.y1, line.z1, line.x2, line.y2, line.z2, line.colour)
     end
 end
 
 function Breadcrumbs.PlacePolygon(r, n, colour)
-    local lines = Breadcrumbs.DrawPolygon(r, n, colour)
+    local lines = Breadcrumbs.CreatePolygon(r, n, colour)
     for _, line in pairs( lines ) do
         Breadcrumbs.CreateSavedZoneLine(line.x1, line.y1, line.z1, line.x2, line.y2, line.z2, line.colour)
     end
@@ -336,6 +336,130 @@ end
 function Breadcrumbs.GenerateSavedLines() -- /script Breadcrumbs.GenerateSavedLines()
     local zoneId = GetZoneId()
     local lines = GetSavedZoneLines(zoneId)
+    for _, line in pairs( lines ) do
+        AddLineToPool(line.x1, line.y1, line.z1, line.x2, line.y2, line.z2, line.colour)
+    end
+end
+
+------------------------------------------------------------------------------------------
+-------------------------------- Code from @RoyalTonberry --------------------------------
+------------------------------------------------------------------------------------------
+local function TransformPoint(originX, originZ, distance, angle)
+    local x = originX - distance * sin(angle)
+    local z = originZ - distance * cos(angle)
+    return x, z
+end
+
+local function GetPointLeft(originX, originZ, distance, heading)
+
+    --the player is at (originX, originZ) and looking at (heading) [0, 2*pi) considering N=0, increasing counterclockwise
+    --(originX, originZ), heading = the Normal sticking straight out from the player
+    --Positive Z = South
+    --Positive X = East
+    return TransformPoint(originX, originZ, distance, heading + pi/2)
+end
+
+local function GetPointRight(originX, originZ, distance, heading)
+    return TransformPoint(originX, originZ, distance, heading - pi/2)
+end
+
+local function GetPointStraight(originX, originZ, distance, heading)
+    return TransformPoint(originX, originZ, distance, heading)
+end
+
+function Breadcrumbs.CreateRectangle(length, width, colour)
+    InitialiseZone()
+    local zoneId, playerX, playerY, playerZ = GetUnitRawWorldPosition("player")
+    --heading is Radians with North = 0, and increasing counterclockwise (West = pi/2, South = pi, East = 3*pi/2, North = (0 or 2*pi)
+    local _, _, heading = GetMapPlayerPosition("player")
+    
+    --compute 4 points, directly out from the player, by width/2 * 100 = width * 50 which will convert to centimeters from meters.
+    --and then forward in the direction the player is looking by length * 100, which will convert to centimeters.
+    --the Heading from GetMapPlayerPosition is an angle in Radians.
+    local xL, zL = GetPointLeft(playerX, playerZ, width*50, heading)
+    local xFL, zFL = GetPointStraight(xL, zL, length*100, heading)
+    local xR, zR = GetPointRight(playerX, playerZ, width*50, heading)
+    local xFR, zFR = GetPointStraight(xR, zR, length*100, heading)
+    
+    local line_table = {}
+    local lineNear = CreateLinePrimitive(
+        xL, playerY, zL,
+        xR, playerY, zR,
+        colour or Breadcrumbs.sV.colour or {1, 1, 1}
+    )
+    local lineFar = CreateLinePrimitive(
+        xFL, playerY, zFL,
+        xFR, playerY, zFR,
+        colour or Breadcrumbs.sV.colour or {1, 1, 1}
+    )
+    local lineLeft = CreateLinePrimitive(
+        xL, playerY, zL,
+        xFL, playerY, zFL,
+        colour or Breadcrumbs.sV.colour or {1, 1, 1}
+    )
+    local lineRight = CreateLinePrimitive(
+        xR, playerY, zR,
+        xFR, playerY, zFR,
+        colour or Breadcrumbs.sV.colour or {1, 1, 1}
+    )
+    table.insert(line_table, lineNear)
+    table.insert(line_table, lineFar)
+    table.insert(line_table, lineLeft)
+    table.insert(line_table, lineRight)
+    
+    return line_table
+end
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+
+function Breadcrumbs.DrawRectangleFromSlashCommand(input)
+    if not input then return end
+    local length, width = string.match(input, "^%s*(%d+)%s*:%s*(%d+)%s*$")
+    if length and width then
+        Breadcrumbs.DrawRectangle(length, width)
+    else
+        d("Invalid input. Use format: length:width (e.g., 5:3)")
+    end
+end
+
+function Breadcrumbs.DrawPolygonFromSlashCommand(input)
+    if not input then return end
+    local radius, n = string.match(input, "^%s*(%d+)%s*:%s*(%d+)%s*$")
+    if radius and n then
+        Breadcrumbs.DrawPolygon(radius, n)
+    else
+        d("Invalid input. Use format: radius:n (e.g., 8:12)")
+    end
+end
+
+function Breadcrumbs.DrawRectangle(length, width, colour)
+    if not length or not width then return end
+    local lines = Breadcrumbs.CreateRectangle(tonumber(length), tonumber(width), colour)
+    for _, line in pairs( lines ) do
+        AddLineToPool(line.x1, line.y1, line.z1, line.x2, line.y2, line.z2, line.colour)
+    end
+end
+
+function Breadcrumbs.SaveRectangle(length, width, colour)
+    if not length or not width then return end
+    local lines = Breadcrumbs.CreateRectangle(tonumber(length), tonumber(width), colour)
+    for _, line in pairs( lines ) do
+        Breadcrumbs.CreateSavedZoneLine(line.x1, line.y1, line.z1, line.x2, line.y2, line.z2, line.colour)
+    end
+end
+
+function Breadcrumbs.DrawCircle(radius, colour)
+    if not radius then return end
+    local lines = Breadcrumbs.CreatePolygon(tonumber(radius), 24, colour)
+    for _, line in pairs( lines ) do
+        AddLineToPool(line.x1, line.y1, line.z1, line.x2, line.y2, line.z2, line.colour)
+    end
+end
+
+function Breadcrumbs.DrawPolygon(radius, n, colour)
+    if not radius or not n then return end
+    local lines = Breadcrumbs.CreatePolygon(tonumber(radius), tonumber(n), colour)
     for _, line in pairs( lines ) do
         AddLineToPool(line.x1, line.y1, line.z1, line.x2, line.y2, line.z2, line.colour)
     end

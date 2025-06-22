@@ -1,6 +1,6 @@
 Breadcrumbs = Breadcrumbs or {}
 Breadcrumbs.name = "Breadcrumbs"
-Breadcrumbs.version = "1.8"
+Breadcrumbs.version = "1.9"
 Breadcrumbs.author = "TheMrPancake"
 Breadcrumbs.title = "|cff7f40Breadcrumbs|r"
 
@@ -163,6 +163,11 @@ local function OnAddOnLoaded(_, name)
     Breadcrumbs.StartPolling()
 
     SLASH_COMMANDS["/breadcrumbs"] = Breadcrumbs.ToggleUIVisibility
+    SLASH_COMMANDS["/rectangle"] = Breadcrumbs.DrawRectangleFromSlashCommand
+    SLASH_COMMANDS["/circle"] = Breadcrumbs.DrawCircle
+    SLASH_COMMANDS["/polygon"] = Breadcrumbs.DrawPolygonFromSlashCommand
+    SLASH_COMMANDS["/refreshlines"] = Breadcrumbs.RefreshLines
+    SLASH_COMMANDS["/brl"] = Breadcrumbs.RefreshLines
 end
 
 EVENT_MANAGER:RegisterForEvent(Breadcrumbs.name, EVENT_ADD_ON_LOADED, OnAddOnLoaded)

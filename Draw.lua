@@ -31,7 +31,7 @@ end
 
 local cX, cY, cZ, fX, fY, fZ, rX, rY, rZ, uX, uY, uZ
 local pX, pY, pZ
-local hash
+-- local hash
 local function GetMatrixValues()
     Set3DRenderSpaceToCurrentCamera(BreadcrumbsControl:GetName())
     cX, cY, cZ = GuiRender3DPositionToWorldPosition(BreadcrumbsControl:Get3DRenderSpaceOrigin())
@@ -41,7 +41,7 @@ local function GetMatrixValues()
 
     _, pX, pY, pZ = GetUnitRawWorldPosition('player')
 
-    hash = cX + cY + cZ + fX + fY + fZ + rX + rY + rZ + uX + uY + uZ
+    -- hash = cX + cY + cZ + fX + fY + fZ + rX + rY + rZ + uX + uY + uZ + linePoolSize
 end
 
 Breadcrumbs.GetMatrixValues = GetMatrixValues
@@ -172,14 +172,12 @@ end
 
 function Breadcrumbs.DrawAllLines()
     local linePool = GetLinePool()
-    local old_hash = hash
     GetMatrixValues()
     if Breadcrumbs.showUI then 
         DrawMarkers()
     end
     for _, line in pairs( linePool ) do
-        if line.use then 
-            if (old_hash == hash) then return end
+        if line.use then
             local x1, y1, x2, y2, scale = CalculateView(line.x1, line.y1, line.z1, line.x2, line.y2, line.z2)
             if x1 and y1 and x2 and y2 and scale >= Breadcrumbs.sV.minimumScale then 
                 DrawLine(x1, y1, x2, y2, line, scale)
