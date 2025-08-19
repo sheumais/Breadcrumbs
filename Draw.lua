@@ -195,14 +195,16 @@ function Breadcrumbs.DrawAll3DLines()
 end
 
 function Breadcrumbs.InitialiseLine(line)
+    local lineBackdrop = line.backdrop
     if Breadcrumbs.sV.depthMarkers then
         if not line.lineControl:Has3DRenderSpace() then
             line.lineControl:Create3DRenderSpace()
         end
+        lineBackdrop:SetHidden(true)
         Breadcrumbs.DrawAll3DLines()
         return
     end
-    local lineBackdrop = line.backdrop
+    lineBackdrop:SetHidden(false)
     lineBackdrop:SetAnchorFill()
     local r, g, b = unpack(line.colour)
     lineBackdrop:SetCenterColor(r, g, b, Breadcrumbs.sV.alpha)

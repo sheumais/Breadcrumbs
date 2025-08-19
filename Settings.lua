@@ -120,7 +120,10 @@ local optionsTable = {
                 name = "Use 3D Lines",
                 tooltip = "Replaces 2d perspective lines with 3d controls",
                 getFunc = function() return Breadcrumbs.sV.depthMarkers end,
-                setFunc = function(value) Breadcrumbs.sV.depthMarkers = value Breadcrumbs.RefreshLines() end,
+                setFunc = function(value) 
+                    Breadcrumbs.sV.depthMarkers = value
+                    -- ReloadUI("ingame")
+                end,
                 requiresReload = true,
             },
             {
