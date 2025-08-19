@@ -26,6 +26,9 @@ function Breadcrumbs.StartPolling()
     Breadcrumbs.scaleFactor = 1. / width
 
     EVENT_MANAGER:UnregisterForUpdate( Breadcrumbs.name .. "Update" )
+    if Breadcrumbs.sV.depthMarkers then 
+        Breadcrumbs.DrawAll3DLines() 
+    end
     EVENT_MANAGER:RegisterForUpdate( Breadcrumbs.name .. "Update", Breadcrumbs.sV.polling, DrawAllLines )
 end
 
@@ -147,7 +150,58 @@ local function DrawMarkers()
     TryDrawMarker(Breadcrumbs.sV.loc2, Breadcrumbs.marker2)
 end
 
+function Breadcrumbs.calculateRoll(x, y, z)
+    local roll = math.atan2(y, x)
+    if (x < 0) then 
+        roll = roll - math.pi
+    end
+    return roll
+end
+
+function Breadcrumbs.calculateYaw(x, y, z)
+    local yaw = math.atan2(z, x)
+    return yaw
+end
+
+function Breadcrumbs.DrawAll3DLines()
+    local linePool = Breadcrumbs.GetLinePool()
+    for _, line in pairs( linePool ) do
+        if line.use then line.lineControl:SetHidden(false) else line.lineControl:SetHidden(true) end
+        line.lineControl:SetTexture(Breadcrumbs.lineTextures[line.texture or Breadcrumbs.sV.fallbackLineStyle or 1] or "esoui/art/icons/icon_missing.dds")
+        if not line.lineControl:Has3DRenderSpace() then
+            line.lineControl:Create3DRenderSpace()
+        end
+        local dx = (line.x2-line.x1)/2
+        local dy = (line.y2-line.y1)/2
+        local dz = (line.z2-line.z1)/2
+        local mx = line.x1+dx
+        local my = line.y1+dy
+        local mz = line.z1+dz
+        local length = math.sqrt(dx*dx + dy*dy + dz*dz)
+        local width = length / 50.0
+        local height = Breadcrumbs.sV.width / 20
+        line.lineControl:Set3DLocalDimensions(width, height)
+        line.lineControl:SetDrawLevel(3)
+        local r, g, b = unpack(line.colour)
+        line.lineControl:SetColor(r, g, b, Breadcrumbs.sV.alpha)
+        line.lineControl:Set3DRenderSpaceUsesDepthBuffer(true)
+        line.lineControl:Set3DRenderSpaceOrigin(0,0,0)
+        local worldX, worldY, worldZ = WorldPositionToGuiRender3DPosition(mx, my+5, mz)
+        line.lineControl:Set3DRenderSpaceOrigin(worldX, worldY, worldZ)
+        local roll = Breadcrumbs.calculateRoll(dx, dy, dz)
+        local yaw = Breadcrumbs.calculateYaw(dx, dy, dz)
+        line.lineControl:Set3DRenderSpaceOrientation(math.pi/2.0,-yaw,roll)
+    end
+end
+
 function Breadcrumbs.InitialiseLine(line)
+    if Breadcrumbs.sV.depthMarkers then
+        if not line.lineControl:Has3DRenderSpace() then
+            line.lineControl:Create3DRenderSpace()
+        end
+        Breadcrumbs.DrawAll3DLines()
+        return
+    end
     local lineBackdrop = line.backdrop
     lineBackdrop:SetAnchorFill()
     local r, g, b = unpack(line.colour)
@@ -171,11 +225,12 @@ function Breadcrumbs.DrawLine(x1, y1, x2, y2, line, scale)
 end
 
 function Breadcrumbs.DrawAllLines()
-    local linePool = GetLinePool()
     GetMatrixValues()
-    if Breadcrumbs.showUI then 
+    if Breadcrumbs.showUI then
         DrawMarkers()
     end
+    if Breadcrumbs.sV.depthMarkers then return end
+    local linePool = GetLinePool()
     for _, line in pairs( linePool ) do
         if line.use then
             local x1, y1, x2, y2, scale = CalculateView(line.x1, line.y1, line.z1, line.x2, line.y2, line.z2)

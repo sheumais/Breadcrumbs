@@ -1,6 +1,6 @@
 Breadcrumbs = Breadcrumbs or {}
 Breadcrumbs.name = "Breadcrumbs"
-Breadcrumbs.version = "1.9"
+Breadcrumbs.version = "1.10"
 Breadcrumbs.author = "TheMrPancake"
 Breadcrumbs.title = "|cff7f40Breadcrumbs|r"
 
@@ -22,10 +22,19 @@ Breadcrumbs.defaults = {
     polling = 10,
     recording = 250,
     minimumScale = 0.15,
+    depthMarkers = true,
+    fallbackLineStyle = 2,
 }
 Breadcrumbs.iconTextures = {
     [1] = "Breadcrumbs/icons/one.dds",
     [2] = "Breadcrumbs/icons/two.dds",
+}
+
+Breadcrumbs.lineTextures = {
+    [1] = "Breadcrumbs/icons/uniform.dds",
+    [2] = "Breadcrumbs/icons/gradient.dds",
+    [3] = "Breadcrumbs/icons/dotted.dds",
+    [4] = "Breadcrumbs/icons/dotted2.dds",
 }
 
 Breadcrumbs.window = GetWindowManager()
@@ -43,6 +52,12 @@ function Breadcrumbs.CreateTopLevelControl()
     Breadcrumbs.win:SetDrawLayer( DL_BACKGROUND )
     Breadcrumbs.win:SetDrawTier( DT_LOW )
     Breadcrumbs.win:SetDrawLevel( 0 )
+
+    Breadcrumbs.depthwin = Breadcrumbs.window:CreateTopLevelWindow("Breadcrumbs3DWindow")
+    Breadcrumbs.depthwin:SetDrawLayer( DL_BACKGROUND )
+	Breadcrumbs.depthwin:SetDrawTier( DT_LOW )
+	Breadcrumbs.depthwin:SetDrawLevel( 0 )
+    Breadcrumbs.depthwin:Create3DRenderSpace()
 
     local frag = ZO_HUDFadeSceneFragment:New( Breadcrumbs.win )
     HUD_UI_SCENE:AddFragment( frag )

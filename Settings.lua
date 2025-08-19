@@ -115,6 +115,34 @@ local optionsTable = {
                 getFunc = function() return Breadcrumbs.sV.minimumScale end,
                 setFunc = function(value) Breadcrumbs.sV.minimumScale = value end,
             },
+            {
+                type = "checkbox",
+                name = "Use 3D Lines",
+                tooltip = "Replaces 2d perspective lines with 3d controls",
+                getFunc = function() return Breadcrumbs.sV.depthMarkers end,
+                setFunc = function(value) Breadcrumbs.sV.depthMarkers = value Breadcrumbs.RefreshLines() end,
+                requiresReload = true,
+            },
+            {
+                type = "iconpicker",
+                name = "Default line texture",
+                choices = Breadcrumbs.lineTextures,
+                getFunc = function() return Breadcrumbs.lineTextures[Breadcrumbs.sV.fallbackLineStyle] end,
+                setFunc = function(var)
+                    for i, texture in ipairs(Breadcrumbs.lineTextures) do
+                        if texture == var then
+                            Breadcrumbs.sV.fallbackLineStyle = i
+                            break
+                        end
+                    end
+                    Breadcrumbs.RefreshLines()
+                end,
+                maxColumns = 5,
+                visibleRows = 2,
+                iconSize = 32,
+                defaultColor = ZO_ColorDef:New("FFFFFF"),
+                default = Breadcrumbs.defaults.fallbackLineStyle,
+            },
         },
     },
     {

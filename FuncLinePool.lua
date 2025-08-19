@@ -2,8 +2,8 @@ Breadcrumbs = Breadcrumbs or {}
 
 local InitialiseZone, CreateLinePrimitive, GetZoneId, RefreshLines, AddLineToPool, GetSavedZoneLines, sin, cos, min, pi
 
-function Breadcrumbs.CreateLinePrimitive(x1, y1, z1, x2, y2, z2, colour --[[ Nilable --]] )
-    if x1 == nil or y1 == nil or z1 == nil or x2 == nil or y2 == nil or z2 == nil or colour == "" then return end
+function Breadcrumbs.CreateLinePrimitive(x1, y1, z1, x2, y2, z2, colour --[[ Nilable --]], texture --[[ Nilable ]] )
+    if x1 == nil or y1 == nil or z1 == nil or x2 == nil or y2 == nil or z2 == nil or colour == "" or texture == "" then return end
     return {
         x1 = x1,
         y1 = y1,
@@ -11,7 +11,8 @@ function Breadcrumbs.CreateLinePrimitive(x1, y1, z1, x2, y2, z2, colour --[[ Nil
         x2 = x2,
         y2 = y2,
         z2 = z2,
-        colour = colour or Breadcrumbs.sV.colour or {1, 1, 1}
+        colour = colour or Breadcrumbs.sV.colour or {1, 1, 1},
+        texture = texture or Breadcrumbs.sV.fallbackLineStyle or 1,
     }
 end
 
@@ -29,8 +30,16 @@ function Breadcrumbs.CreateLineControl( name )
     }
 end
 
+function Breadcrumbs.Create3DLineControl( name )
+    local line = {}
+    line.lineControl = WINDOW_MANAGER:CreateControl(name, Breadcrumbs.win, CT_TEXTURE)
+    return {
+        ["lineControl"] = line.lineControl,
+    }
+end
+
 -- todo, replace this with ZO_ControlPool
-function Breadcrumbs.AddLineToPool( x1, y1, z1, x2, y2, z2, colour --[[ Nilable --]] )
+function Breadcrumbs.AddLineToPool( x1, y1, z1, x2, y2, z2, colour --[[ Nilable --]], texture --[[ Nilable ]] )
     local line
     local linePool = Breadcrumbs.GetLinePool()
     -- try to find an unused line
@@ -42,14 +51,20 @@ function Breadcrumbs.AddLineToPool( x1, y1, z1, x2, y2, z2, colour --[[ Nilable 
     end
     -- create a new line if no unused line is available
     if not line then
-        line = Breadcrumbs.CreateLineControl( "BreadcrumbsLine" .. (#linePool+1) )
-        linePool[#linePool + 1] = line
+        if Breadcrumbs.sV.depthMarkers then 
+            line = Breadcrumbs.Create3DLineControl( "BreadcrumbsLine3D" .. (#linePool+1) )
+            linePool[#linePool + 1] = line
+        else
+            line = Breadcrumbs.CreateLineControl( "BreadcrumbsLine" .. (#linePool+1) )
+            linePool[#linePool + 1] = line
+        end
     end
     -- store line data
     line.use = true
     line.x1, line.y1, line.z1 = x1, y1, z1
     line.x2, line.y2, line.z2 = x2, y2, z2
     line.colour = colour or Breadcrumbs.sV.colour or {1, 1, 1}
+    line.texture = texture or Breadcrumbs.sV.fallbackLineStyle or 1
     Breadcrumbs.InitialiseLine(line)
     return line
 end
@@ -462,6 +477,38 @@ function Breadcrumbs.DrawPolygon(radius, n, colour)
     local lines = Breadcrumbs.CreatePolygon(tonumber(radius), tonumber(n), colour)
     for _, line in pairs( lines ) do
         AddLineToPool(line.x1, line.y1, line.z1, line.x2, line.y2, line.z2, line.colour)
+    end
+end
+
+Breadcrumbs.GRID_CELLS = 4
+Breadcrumbs.GRID_SIZE = 5000
+
+function Breadcrumbs.PreviewGrid(colour)
+    local N = Breadcrumbs.GRID_SIZE
+    local GC = Breadcrumbs.GRID_CELLS
+
+    InitialiseZone()
+
+    local zoneId, px, py, pz = GetUnitRawWorldPosition("player")
+    local kx = math.floor(px / N + 0.5)
+    local kz = math.floor(pz / N + 0.5)
+
+    local xMin, xMax = (kx - GC) * N, (kx + GC) * N
+    local zMin, zMax = (kz - GC) * N, (kz + GC) * N
+
+    local xMid = (xMin + xMax) / 2
+    local zMid = (zMin + zMax) / 2
+
+    RefreshLines()
+
+    for x = xMin, xMax, N do
+        AddLineToPool(x, py, zMin, x, py, zMid, colour)
+        AddLineToPool(x, py, zMid, x, py, zMax, colour)
+    end
+
+    for z = zMin, zMax, N do
+        AddLineToPool(xMin, py, z, xMid, py, z, colour)
+        AddLineToPool(xMid, py, z, xMax, py, z, colour)
     end
 end
 
